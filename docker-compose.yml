@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  auth-service:
+    image: auth-service
+    env_file:
+      - .env
+    ports:
+      - "8081:8081"
