@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.bybud</groupId>
@@ -7,6 +7,7 @@
   <version>1.0.0</version>
   <packaging>pom</packaging>
 
+  <!-- Modules -->
   <modules>
     <module>auth-service</module>
     <module>user-service</module>
@@ -14,11 +15,17 @@
     <module>common</module>
   </modules>
 
+  <!-- Properties -->
   <properties>
-    <java.version>23</java.version>
-    <spring-boot.version>3.1.5</spring-boot.version>
+    <java.version>21</java.version>
+    <spring-boot.version>3.4.0</spring-boot.version>
+    <jjwt.version>0.12.5</jjwt.version>
+    <h2.version>2.2.220</h2.version>
+    <jackson.version>2.15.2</jackson.version>
+    <mockito.version>4.11.0</mockito.version>
   </properties>
 
+  <!-- Dependency Management -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -31,12 +38,22 @@
     </dependencies>
   </dependencyManagement>
 
+  <!-- Build -->
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.11.0</version>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
