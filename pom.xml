@@ -18,11 +18,11 @@
   <!-- Properties -->
   <properties>
     <java.version>21</java.version>
-    <spring-boot.version>3.4.0</spring-boot.version>
+    <spring-boot.version>3.3.6</spring-boot.version>
     <jjwt.version>0.12.5</jjwt.version>
     <h2.version>2.2.220</h2.version>
     <jackson.version>2.15.2</jackson.version>
-    <mockito.version>4.11.0</mockito.version>
+    <mockito.version>5.11.0</mockito.version>
   </properties>
 
   <!-- Dependency Management -->
