@@ -1,5 +1,6 @@
 package com.bybud.userservice.model;
 
+import com.bybud.common.model.RoleName;
 import jakarta.persistence.*;
 import java.util.Set;
 

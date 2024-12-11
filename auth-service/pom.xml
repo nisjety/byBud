@@ -165,7 +165,6 @@
             <scope>test</scope>
         </dependency>
 
-
         <!-- Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -179,10 +178,7 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>

@@ -4,12 +4,11 @@ import com.bybud.userservice.dto.CreateUserDTO;
 import com.bybud.userservice.dto.UserDTO;
 import com.bybud.userservice.model.AppRole;
 import com.bybud.userservice.model.AppUser;
-import com.bybud.userservice.model.RoleName;
+import com.bybud.common.model.RoleName;
 import com.bybud.userservice.repository.AppRoleRepository;
 import com.bybud.userservice.repository.AppUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;

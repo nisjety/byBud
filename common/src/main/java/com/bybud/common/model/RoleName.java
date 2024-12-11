@@ -1,4 +1,4 @@
-package com.bybud.userservice.model;
+package com.bybud.common.model;
 
 public enum RoleName {
     ROLE_CUSTOMER,

@@ -1,11 +1,11 @@
 server:
-  port: 8083
+  port: 8081
 
 # Datasource Configuration
 spring:
   datasource:
-    name: delivery-service
-    url: jdbc:h2:mem:bybud_delivery
+    name: auth-service
+    url: jdbc:h2:mem:bybud_auth
     driver-class-name: org.h2.Driver
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
@@ -20,6 +20,10 @@ spring:
     console:
       path: /h2-console
 
-# Auth-Service Configuration
-auth-service:
-  url: http://localhost:8081
+# JWT Configuration
+ByBud:
+  app:
+    jwtSecret: ${JWT_SECRET}
+    jwtRefreshSecret: ${JWT_REFRESH_SECRET}
+    jwtExpirationMs: ${JWT_EXPIRATION_MS}
+    jwtRefreshExpirationMs: ${JWT_REFRESH_EXPIRATION_MS}

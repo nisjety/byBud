@@ -2,13 +2,12 @@ package com.bybud.userservice.service;
 
 import com.bybud.userservice.dto.RoleDTO;
 import com.bybud.userservice.model.AppRole;
-import com.bybud.userservice.model.RoleName;
+import com.bybud.common.model.RoleName;
 import com.bybud.userservice.repository.AppRoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

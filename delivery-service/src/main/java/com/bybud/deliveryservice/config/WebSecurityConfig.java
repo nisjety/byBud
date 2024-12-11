@@ -1,4 +1,4 @@
-package com.bybud.authservice.security;
+package com.bybud.deliveryservice.config;
 
 import com.bybud.common.security.AuthTokenFilter;
 import com.bybud.common.security.JwtTokenProvider;
@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,29 +18,30 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class WebSecurityConfig {
 
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, JwtTokenProvider jwtTokenProvider) {
-        this.userDetailsServiceImpl = userDetailsServiceImpl;
+    public WebSecurityConfig(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider) {
+        this.userDetailsService = userDetailsService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Bean
-    public AuthTokenFilter authTokenFilter() {
-        return new AuthTokenFilter(userDetailsServiceImpl, jwtTokenProvider);
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/orders/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    @Bean
+    public AuthTokenFilter authTokenFilter() {
+        return new AuthTokenFilter(userDetailsService, jwtTokenProvider);
     }
 
     @Bean

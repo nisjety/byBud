@@ -58,7 +58,7 @@ public class AuthUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> (GrantedAuthority) () -> role.getName())
+                .map(role -> (GrantedAuthority) () -> role.getName().name())
                 .collect(Collectors.toSet());
     }
 

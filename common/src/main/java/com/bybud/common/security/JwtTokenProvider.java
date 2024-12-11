@@ -1,4 +1,4 @@
-package com.bybud.authservice.security;
+package com.bybud.common.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

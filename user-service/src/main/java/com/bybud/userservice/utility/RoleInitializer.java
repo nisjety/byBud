@@ -1,7 +1,7 @@
 package com.bybud.userservice.utility;
 
 import com.bybud.userservice.model.AppRole;
-import com.bybud.userservice.model.RoleName;
+import com.bybud.common.model.RoleName;
 import com.bybud.userservice.repository.AppRoleRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;

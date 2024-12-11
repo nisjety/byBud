@@ -1,5 +1,6 @@
 package com.bybud.authservice.model;
 
+import com.bybud.common.model.RoleName; // Import RoleName from user-service
 import jakarta.persistence.*;
 
 @Entity
@@ -10,18 +11,18 @@ public class AuthRole {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
-    private String name;
+    private RoleName name; // Use RoleName enum instead of String
 
-    // Constructor
-    public AuthRole(String name) {
+    // Constructors
+    public AuthRole() {}
+
+    public AuthRole(RoleName name) {
         this.name = name;
     }
 
-    public AuthRole() {
-    }
-
-    // Getters and Setters
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -30,11 +31,12 @@ public class AuthRole {
         this.id = id;
     }
 
-    public String getName() {
+    public RoleName getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(RoleName name) {
         this.name = name;
     }
 }
+

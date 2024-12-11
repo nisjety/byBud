@@ -6,7 +6,8 @@ import com.bybud.authservice.model.AuthRole;
 import com.bybud.authservice.model.AuthUser;
 import com.bybud.authservice.repository.AuthRoleRepository;
 import com.bybud.authservice.repository.AuthUserRepository;
-import com.bybud.authservice.security.JwtTokenProvider;
+import com.bybud.common.security.JwtTokenProvider;
+import com.bybud.common.model.RoleName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,15 +45,15 @@ public class AuthService {
     public AuthUser register(RegisterRequest registerRequest) {
         validateRegistrationData(registerRequest);
 
-        AuthRole role = authRoleRepository.findByName(registerRequest.getRole().toUpperCase())
+        AuthRole role = authRoleRepository.findByName(RoleName.valueOf(registerRequest.getRole().toUpperCase()))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid role specified"));
 
-        AuthUser user = new AuthUser();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setActive(true);
-        user.setRoles(Set.of(role));
+        AuthUser user = new AuthUser(
+                registerRequest.getUsername(),
+                registerRequest.getEmail(),
+                passwordEncoder.encode(registerRequest.getPassword()),
+                Set.of(role)
+        );
 
         return authUserRepository.save(user);
     }
@@ -105,8 +106,9 @@ public class AuthService {
 
 
     private JwtResponse createJwtResponse(AuthUser user, String accessToken, String refreshToken) {
+        // Map RoleName values to a List<String>
         List<String> roles = user.getRoles().stream()
-                .map(AuthRole::getName)
+                .map(role -> role.getName().name()) // Convert RoleName enum to String
                 .collect(Collectors.toList());
 
         return new JwtResponse(

@@ -2,7 +2,7 @@ package com.bybud.userservice.service;
 
 import com.bybud.userservice.dto.RoleDTO;
 import com.bybud.userservice.model.AppRole;
-import com.bybud.userservice.model.RoleName;
+import com.bybud.common.model.RoleName;
 import com.bybud.userservice.repository.AppRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

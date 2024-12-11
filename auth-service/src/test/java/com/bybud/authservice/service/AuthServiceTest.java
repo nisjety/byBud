@@ -1,12 +1,13 @@
 package com.bybud.authservice.service;
 
+import com.bybud.common.model.RoleName; // Correct import for RoleName
 import com.bybud.authservice.dto.*;
 import com.bybud.authservice.exception.UserNotFoundException;
 import com.bybud.authservice.model.AuthRole;
 import com.bybud.authservice.model.AuthUser;
 import com.bybud.authservice.repository.AuthRoleRepository;
 import com.bybud.authservice.repository.AuthUserRepository;
-import com.bybud.authservice.security.JwtTokenProvider;
+import com.bybud.common.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -53,7 +54,7 @@ class AuthServiceTest {
         registerRequest.setUsername("testuser");
         registerRequest.setEmail("test@example.com");
         registerRequest.setPassword("password");
-        registerRequest.setRole("ROLE_USER");
+        registerRequest.setRole("ROLE_CUSTOMER");
         return registerRequest;
     }
 
@@ -64,8 +65,8 @@ class AuthServiceTest {
     @Test
     void testRegister_Success() {
         RegisterRequest registerRequest = createRegisterRequest();
-        AuthRole role = new AuthRole("ROLE_USER");
-        when(authRoleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
+        AuthRole role = new AuthRole(RoleName.ROLE_CUSTOMER);
+        when(authRoleRepository.findByName(RoleName.ROLE_CUSTOMER)).thenReturn(Optional.of(role));
         when(authUserRepository.existsByUsername("testuser")).thenReturn(false);
         when(authUserRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
@@ -80,7 +81,6 @@ class AuthServiceTest {
         assertTrue(result.getRoles().contains(role));
         verify(authUserRepository).save(any(AuthUser.class));
     }
-
 
     @Test
     void testRegister_ExistingUsername() {
@@ -113,7 +113,7 @@ class AuthServiceTest {
     @Test
     void testLogin_Success() {
         LoginRequest loginRequest = createLoginRequest("password");
-        AuthUser authUser = new AuthUser("testuser", "test@example.com", "password", Set.of(new AuthRole("ROLE_USER")));
+        AuthUser authUser = new AuthUser("testuser", "test@example.com", "encodedPassword", Set.of(new AuthRole(RoleName.ROLE_CUSTOMER)));
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(mock(Authentication.class));
         when(authUserRepository.findByUsername(eq("testuser"))).thenReturn(Optional.of(authUser));
@@ -125,7 +125,7 @@ class AuthServiceTest {
         assertEquals("accessToken", jwtResponse.getAccessToken());
         assertEquals("refreshToken", jwtResponse.getRefreshToken());
         assertNotNull(jwtResponse.getRoles());
-        assertTrue(jwtResponse.getRoles().contains("ROLE_USER"));
+        assertTrue(jwtResponse.getRoles().contains("ROLE_CUSTOMER"));
     }
 
     @Test
@@ -147,7 +147,7 @@ class AuthServiceTest {
     @Test
     void testRefreshToken_Success() {
         String refreshToken = "validRefreshToken";
-        AuthUser authUser = new AuthUser("testuser", "test@example.com", "password", Set.of(new AuthRole("ROLE_USER")));
+        AuthUser authUser = new AuthUser("testuser", "test@example.com", "password", Set.of(new AuthRole(RoleName.ROLE_CUSTOMER)));
         when(jwtTokenProvider.validateJwtRefreshToken(eq(refreshToken))).thenReturn(true);
         when(jwtTokenProvider.getUsernameFromJwtRefreshToken(eq(refreshToken))).thenReturn("testuser");
         when(authUserRepository.findByUsername(eq("testuser"))).thenReturn(Optional.of(authUser));
@@ -175,14 +175,14 @@ class AuthServiceTest {
 
     @Test
     void testGetUserDetails_Success() {
-        AuthUser authUser = new AuthUser("testuser", "test@example.com", "encodedPassword", Set.of(new AuthRole("ROLE_USER")));
+        AuthUser authUser = new AuthUser("testuser", "test@example.com", "encodedPassword", Set.of(new AuthRole(RoleName.ROLE_CUSTOMER)));
         when(authUserRepository.findByUsername(eq("testuser"))).thenReturn(Optional.of(authUser));
 
         JwtResponse jwtResponse = authService.getUserDetails("testuser");
 
         assertEquals("testuser", jwtResponse.getUsername());
         assertEquals("test@example.com", jwtResponse.getEmail());
-        assertTrue(jwtResponse.getRoles().contains("ROLE_USER"));
+        assertTrue(jwtResponse.getRoles().contains("ROLE_CUSTOMER"));
     }
 
     @Test
