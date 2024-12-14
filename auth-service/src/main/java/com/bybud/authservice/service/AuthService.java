@@ -1,20 +1,19 @@
 package com.bybud.authservice.service;
 
-import com.bybud.authservice.dto.*;
-import com.bybud.authservice.exception.UserNotFoundException;
-import com.bybud.authservice.model.AuthRole;
-import com.bybud.authservice.model.AuthUser;
-import com.bybud.authservice.repository.AuthRoleRepository;
-import com.bybud.authservice.repository.AuthUserRepository;
-import com.bybud.common.security.JwtTokenProvider;
+import com.bybud.common.dto.JwtResponse;
+import com.bybud.common.exception.UserNotFoundException;
+import com.bybud.common.model.Role;
+import com.bybud.common.model.User;
 import com.bybud.common.model.RoleName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.bybud.common.repository.RoleRepository;
+import com.bybud.common.repository.UserRepository;
+import com.bybud.common.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,44 +21,48 @@ import java.util.stream.Collectors;
 @Service
 public class AuthService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-
-    private final AuthUserRepository authUserRepository;
-    private final AuthRoleRepository authRoleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthService(AuthUserRepository authUserRepository,
-                       AuthRoleRepository authRoleRepository,
+    public AuthService(UserRepository userRepository,
+                       RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
                        JwtTokenProvider jwtTokenProvider) {
-        this.authUserRepository = authUserRepository;
-        this.authRoleRepository = authRoleRepository;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public AuthUser register(RegisterRequest registerRequest) {
-        validateRegistrationData(registerRequest);
+    public User register(String username, String email, String password, String fullName, LocalDate dateOfBirth, String roleName) {
+        validateRegistrationData(username, email);
 
-        AuthRole role = authRoleRepository.findByName(RoleName.valueOf(registerRequest.getRole().toUpperCase()))
+        Role role = roleRepository.findByName(RoleName.valueOf(roleName.toUpperCase()))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid role specified"));
 
-        AuthUser user = new AuthUser(
-                registerRequest.getUsername(),
-                registerRequest.getEmail(),
-                passwordEncoder.encode(registerRequest.getPassword()),
+        User user = new User(
+                username,
+                email,
+                passwordEncoder.encode(password),
+                fullName,
+                dateOfBirth,
                 Set.of(role)
         );
 
-        return authUserRepository.save(user);
+        return userRepository.save(user);
     }
 
-    public JwtResponse login(LoginRequest loginRequest) {
-        AuthUser user = authenticate(loginRequest);
+    public JwtResponse login(String usernameOrEmail, String password) {
+        authenticate(usernameOrEmail, password);
+
+        User user = userRepository.findByUsername(usernameOrEmail)
+                .or(() -> userRepository.findByEmail(usernameOrEmail))
+                .orElseThrow(() -> new IllegalArgumentException("Bad credentials"));
 
         String accessToken = jwtTokenProvider.generateJwtToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateJwtRefreshToken(user.getUsername());
@@ -69,12 +72,11 @@ public class AuthService {
 
     public JwtResponse refreshToken(String refreshToken) {
         if (!jwtTokenProvider.validateJwtRefreshToken(refreshToken)) {
-            logger.error("Invalid refresh token: {}", refreshToken);
             throw new IllegalArgumentException("Invalid refresh token");
         }
 
         String username = jwtTokenProvider.getUsernameFromJwtRefreshToken(refreshToken);
-        AuthUser user = authUserRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         String newAccessToken = jwtTokenProvider.generateJwtToken(username);
@@ -83,32 +85,22 @@ public class AuthService {
     }
 
     public JwtResponse getUserDetails(String usernameOrEmail) {
-        AuthUser user = authUserRepository.findByUsername(usernameOrEmail)
-                .or(() -> authUserRepository.findByEmail(usernameOrEmail))
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findByUsername(usernameOrEmail)
+                .or(() -> userRepository.findByEmail(usernameOrEmail))
+                .orElseThrow(() -> new UserNotFoundException("User not found with username or email: " + usernameOrEmail));
 
         return createJwtResponse(user, null, null);
     }
 
-    private AuthUser authenticate(LoginRequest loginRequest) {
-        String identifier = loginRequest.getUsernameOrEmail();
-
-        // Perform authentication before fetching user details
+    private void authenticate(String usernameOrEmail, String password) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(identifier, loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(usernameOrEmail, password)
         );
-
-        // If authentication succeeds, fetch the user
-        return authUserRepository.findByUsername(identifier)
-                .or(() -> authUserRepository.findByEmail(identifier))
-                .orElseThrow(() -> new IllegalArgumentException("Bad credentials"));
     }
 
-
-    private JwtResponse createJwtResponse(AuthUser user, String accessToken, String refreshToken) {
-        // Map RoleName values to a List<String>
+    private JwtResponse createJwtResponse(User user, String accessToken, String refreshToken) {
         List<String> roles = user.getRoles().stream()
-                .map(role -> role.getName().name()) // Convert RoleName enum to String
+                .map(role -> role.getName().name())
                 .collect(Collectors.toList());
 
         return new JwtResponse(
@@ -117,16 +109,16 @@ public class AuthService {
                 String.valueOf(user.getId()),
                 user.getUsername(),
                 user.getEmail(),
-                user.getUsername(),
+                user.getFullName(),
                 roles
         );
     }
 
-    private void validateRegistrationData(RegisterRequest registerRequest) {
-        if (authUserRepository.existsByUsername(registerRequest.getUsername())) {
+    private void validateRegistrationData(String username, String email) {
+        if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username is already in use");
         }
-        if (authUserRepository.existsByEmail(registerRequest.getEmail())) {
+        if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email is already in use");
         }
     }

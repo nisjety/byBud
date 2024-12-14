@@ -1,17 +1,18 @@
 package com.bybud.userservice.service;
 
-import com.bybud.userservice.dto.CreateUserDTO;
-import com.bybud.userservice.dto.UserDTO;
-import com.bybud.userservice.model.AppRole;
-import com.bybud.userservice.model.AppUser;
+import com.bybud.common.dto.UserDTO;
+import com.bybud.common.model.Role;
 import com.bybud.common.model.RoleName;
-import com.bybud.userservice.repository.AppRoleRepository;
-import com.bybud.userservice.repository.AppUserRepository;
+import com.bybud.common.model.User;
+import com.bybud.common.repository.RoleRepository;
+import com.bybud.common.repository.UserRepository;
+import com.bybud.userservice.dto.CreateUserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,46 +21,41 @@ import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
-    private AppUserRepository appUserRepository;
-    private AppRoleRepository appRoleRepository;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private UserService userService;
 
     @BeforeEach
     void setUp() {
-        appUserRepository = mock(AppUserRepository.class);
-        appRoleRepository = mock(AppRoleRepository.class);
+        userRepository = mock(UserRepository.class);
+        roleRepository = mock(RoleRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        userService = new UserService(appUserRepository, appRoleRepository, passwordEncoder);
+        userService = new UserService(userRepository, roleRepository, passwordEncoder);
     }
 
     @Test
-    void testCreateUserSuccess() {
+    void testCreateUser_Success() {
         // Arrange
         CreateUserDTO createUserDTO = new CreateUserDTO();
         createUserDTO.setUsername("testuser");
-        createUserDTO.setFullName("Test User");
         createUserDTO.setEmail("test@example.com");
         createUserDTO.setPassword("password123");
-        createUserDTO.setDateOfBirth(LocalDate.of(1990, 1, 1));
 
-        AppRole customerRole = new AppRole();
-        customerRole.setId(1L);
-        customerRole.setName(RoleName.ROLE_CUSTOMER);
-
-        when(appUserRepository.existsByUsername("testuser")).thenReturn(false);
-        when(appUserRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(appRoleRepository.findByName(RoleName.ROLE_CUSTOMER)).thenReturn(Optional.of(customerRole));
+        Role customerRole = new Role(RoleName.ROLE_CUSTOMER);
+        when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(roleRepository.findByName(RoleName.ROLE_CUSTOMER)).thenReturn(Optional.of(customerRole));
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
-        AppUser savedUser = new AppUser();
+        User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setUsername("testuser");
-        savedUser.setFullName("Test User");
         savedUser.setEmail("test@example.com");
         savedUser.setPassword("encodedPassword");
         savedUser.setRoles(Set.of(customerRole));
-        when(appUserRepository.save(any(AppUser.class))).thenReturn(savedUser);
+
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         // Act
         UserDTO result = userService.createUser(createUserDTO);
@@ -67,40 +63,69 @@ class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("testuser", result.getUsername());
-        assertEquals("Test User", result.getFullName());
         assertEquals("test@example.com", result.getEmail());
         assertTrue(result.getRoles().contains("ROLE_CUSTOMER"));
 
-        verify(appUserRepository, times(1)).save(any(AppUser.class));
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
-    void testCreateUserThrowsExceptionWhenUsernameExists() {
+    void testCreateUser_UsernameExists() {
         // Arrange
         CreateUserDTO createUserDTO = new CreateUserDTO();
         createUserDTO.setUsername("testuser");
-        when(appUserRepository.existsByUsername("testuser")).thenReturn(true);
+        when(userRepository.existsByUsername("testuser")).thenReturn(true);
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> userService.createUser(createUserDTO));
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.createUser(createUserDTO)
+        );
         assertEquals("Username is already in use", exception.getMessage());
 
-        verify(appUserRepository, never()).save(any(AppUser.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
-    void testCreateUserThrowsExceptionWhenEmailExists() {
+    void testCreateUser_EmailExists() {
         // Arrange
         CreateUserDTO createUserDTO = new CreateUserDTO();
         createUserDTO.setEmail("test@example.com");
-        when(appUserRepository.existsByEmail("test@example.com")).thenReturn(true);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> userService.createUser(createUserDTO));
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.createUser(createUserDTO)
+        );
         assertEquals("Email is already in use", exception.getMessage());
 
-        verify(appUserRepository, never()).save(any(AppUser.class));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testGetAllUsers() {
+        // Arrange
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("testuser1");
+        user1.setEmail("test1@example.com");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("testuser2");
+        user2.setEmail("test2@example.com");
+
+        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+
+        // Act
+        var result = userService.getAllUsers();
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("testuser1", result.get(0).getUsername());
+        assertEquals("testuser2", result.get(1).getUsername());
+
+        verify(userRepository, times(1)).findAll();
     }
 }

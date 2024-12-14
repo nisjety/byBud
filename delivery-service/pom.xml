@@ -13,8 +13,8 @@
 
     <artifactId>delivery-service</artifactId>
     <version>1.0.0</version>
-    <name>delivery Service</name>
-    <description>Handles delivery management for the ByBud platform</description>
+    <name>Delivery Service</name>
+    <description>Handles Delivery management for the ByBud platform</description>
     <url>https://github.com/nisjety/bybud</url>
 
     <licenses>
@@ -114,7 +114,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- PostgreSQL Driver -->
@@ -198,8 +197,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.bybud.deliveryservice.DeliveryServiceApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 </project>
-

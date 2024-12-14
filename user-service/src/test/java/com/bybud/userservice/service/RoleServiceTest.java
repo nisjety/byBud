@@ -1,9 +1,9 @@
 package com.bybud.userservice.service;
 
-import com.bybud.userservice.dto.RoleDTO;
-import com.bybud.userservice.model.AppRole;
+import com.bybud.common.dto.RoleDTO;
+import com.bybud.common.model.Role;
 import com.bybud.common.model.RoleName;
-import com.bybud.userservice.repository.AppRoleRepository;
+import com.bybud.common.repository.RoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,27 +14,27 @@ import static org.mockito.Mockito.*;
 
 class RoleServiceTest {
 
-    private AppRoleRepository appRoleRepository;
+    private RoleRepository roleRepository;
     private RoleService roleService;
 
     @BeforeEach
     void setUp() {
-        appRoleRepository = mock(AppRoleRepository.class);
-        roleService = new RoleService(appRoleRepository);
+        roleRepository = mock(RoleRepository.class);
+        roleService = new RoleService(roleRepository);
     }
 
     @Test
     void testGetAllRoles() {
         // Arrange
-        AppRole role1 = new AppRole();
+        Role role1 = new Role();
         role1.setId(1L);
         role1.setName(RoleName.ROLE_CUSTOMER);
 
-        AppRole role2 = new AppRole();
+        Role role2 = new Role();
         role2.setId(2L);
         role2.setName(RoleName.ROLE_ADMIN);
 
-        when(appRoleRepository.findAll()).thenReturn(List.of(role1, role2));
+        when(roleRepository.findAll()).thenReturn(List.of(role1, role2));
 
         // Act
         List<RoleDTO> roles = roleService.getAllRoles();
@@ -44,7 +44,7 @@ class RoleServiceTest {
         assertEquals("ROLE_CUSTOMER", roles.get(0).getName());
         assertEquals("ROLE_ADMIN", roles.get(1).getName());
 
-        verify(appRoleRepository, times(1)).findAll();
+        verify(roleRepository, times(1)).findAll();
     }
 
     @Test
@@ -53,13 +53,13 @@ class RoleServiceTest {
         RoleDTO roleDTO = new RoleDTO();
         roleDTO.setName("ROLE_CUSTOMER");
 
-        when(appRoleRepository.existsByName(RoleName.ROLE_CUSTOMER)).thenReturn(false);
+        when(roleRepository.existsByName(RoleName.ROLE_CUSTOMER)).thenReturn(false);
 
-        AppRole savedRole = new AppRole();
+        Role savedRole = new Role();
         savedRole.setId(1L);
         savedRole.setName(RoleName.ROLE_CUSTOMER);
 
-        when(appRoleRepository.save(any(AppRole.class))).thenReturn(savedRole);
+        when(roleRepository.save(any(Role.class))).thenReturn(savedRole);
 
         // Act
         RoleDTO result = roleService.createRole(roleDTO);
@@ -67,7 +67,7 @@ class RoleServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("ROLE_CUSTOMER", result.getName());
-        verify(appRoleRepository, times(1)).save(any(AppRole.class));
+        verify(roleRepository, times(1)).save(any(Role.class));
     }
 
     @Test
@@ -75,13 +75,13 @@ class RoleServiceTest {
         // Arrange
         RoleDTO roleDTO = new RoleDTO();
         roleDTO.setName("ROLE_CUSTOMER");
-        when(appRoleRepository.existsByName(RoleName.ROLE_CUSTOMER)).thenReturn(true);
+        when(roleRepository.existsByName(RoleName.ROLE_CUSTOMER)).thenReturn(true);
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> roleService.createRole(roleDTO));
         assertEquals("Role already exists", exception.getMessage());
 
-        verify(appRoleRepository, never()).save(any(AppRole.class));
+        verify(roleRepository, never()).save(any(Role.class));
     }
 }

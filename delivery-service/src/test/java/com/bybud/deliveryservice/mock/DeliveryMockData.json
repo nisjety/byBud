@@ -1,0 +1,20 @@
+{
+  "deliveries": [
+    {
+      "id": 1,
+      "customerId": "customer123",
+      "courierId": null,
+      "deliveryDetails": "Deliver documents to 123 Main St",
+      "status": "CREATED",
+      "createdDate": "2024-12-11T15:00:00"
+    }
+  ],
+  "bids": [
+    {
+      "id": 1,
+      "deliveryId": 1,
+      "courierId": "courier789",
+      "note": "Will deliver by tomorrow"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "customer": {
+    "id": "customer123",
+    "name": "John Doe",
+    "email": "john.doe@example.com"
+  },
+  "deliveries": [
+    {
+      "id": 1,
+      "customerId": "customer123",
+      "courierId": "courier456",
+      "deliveryDetails": "Deliver package to 456 Oak Ave",
+      "status": "PENDING",
+      "createdDate": "2024-12-10T10:00:00"
+    }
+  ]
+}

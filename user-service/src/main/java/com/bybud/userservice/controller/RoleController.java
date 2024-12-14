@@ -1,6 +1,6 @@
 package com.bybud.userservice.controller;
 
-import com.bybud.userservice.dto.RoleDTO;
+import com.bybud.common.dto.RoleDTO;
 import com.bybud.userservice.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +21,11 @@ public class RoleController {
 
     @GetMapping
     public ResponseEntity<List<RoleDTO>> getAllRoles() {
-        List<RoleDTO> roles = roleService.getAllRoles();
-        return ResponseEntity.ok(roles);
+        return ResponseEntity.ok(roleService.getAllRoles());
     }
 
     @PostMapping
     public ResponseEntity<RoleDTO> createRole(@RequestBody RoleDTO roleDTO) {
-        RoleDTO role = roleService.createRole(roleDTO);
-        return ResponseEntity.ok(role);
+        return ResponseEntity.ok(roleService.createRole(roleDTO));
     }
 }

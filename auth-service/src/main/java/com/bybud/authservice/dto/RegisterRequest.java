@@ -1,9 +1,7 @@
 package com.bybud.authservice.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import java.time.LocalDate;
 
 public class RegisterRequest {
 
@@ -21,6 +19,14 @@ public class RegisterRequest {
             message = "Password must be at least 6 characters long, contain a letter, a number, and a special character."
     )
     private String password;
+
+    @NotBlank(message = "Full name is required.")
+    @Size(max = 100, message = "Full name must not exceed 100 characters.")
+    private String fullName;
+
+    @NotNull(message = "Date of birth is required.")
+    @Past(message = "Date of birth must be in the past.")
+    private LocalDate dateOfBirth;
 
     private String role = "ROLE_USER"; // Default role
 
@@ -49,6 +55,22 @@ public class RegisterRequest {
         this.password = password;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     public String getRole() {
         return role;
     }
@@ -57,5 +79,3 @@ public class RegisterRequest {
         this.role = role;
     }
 }
-
-

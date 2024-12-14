@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,21 +14,48 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@ConditionalOnProperty(name = "bybud.app.jwtSecret")
 public class JwtTokenProvider {
+
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    @Value("${bybud.app.jwtSecret}")
-    private String jwtSecret;
+    private final String jwtSecret;
+    private final String jwtRefreshSecret;
+    private final int jwtExpirationMs;
+    private final int jwtRefreshExpirationMs;
 
-    @Value("${bybud.app.jwtRefreshSecret}")
-    private String jwtRefreshSecret;
+    // Constructor for Dependency Injection
+    public JwtTokenProvider(
+            @Value("${bybud.app.jwtSecret}") String jwtSecret,
+            @Value("${bybud.app.jwtRefreshSecret}") String jwtRefreshSecret,
+            @Value("${bybud.app.jwtExpirationMs}") int jwtExpirationMs,
+            @Value("${bybud.app.jwtRefreshExpirationMs}") int jwtRefreshExpirationMs) {
+        this.jwtSecret = jwtSecret;
+        this.jwtRefreshSecret = jwtRefreshSecret;
+        this.jwtExpirationMs = jwtExpirationMs;
+        this.jwtRefreshExpirationMs = jwtRefreshExpirationMs;
 
-    @Value("${bybud.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
+        System.out.println("JwtTokenProvider initialized with secrets");
 
-    @Value("${bybud.app.jwtRefreshExpirationMs}")
-    private int jwtRefreshExpirationMs;
+    }
+
+    // Getter methods for testing (optional)
+    public String getJwtSecret() {
+        return jwtSecret;
+    }
+
+    public String getJwtRefreshSecret() {
+        return jwtRefreshSecret;
+    }
+
+    public int getJwtExpirationMs() {
+        return jwtExpirationMs;
+    }
+
+    public int getJwtRefreshExpirationMs() {
+        return jwtRefreshExpirationMs;
+    }
 
     // Generate JWT Access Token
     public String generateJwtToken(String username) {

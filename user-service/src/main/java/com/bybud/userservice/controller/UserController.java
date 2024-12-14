@@ -1,7 +1,7 @@
 package com.bybud.userservice.controller;
 
 import com.bybud.userservice.dto.CreateUserDTO;
-import com.bybud.userservice.dto.UserDTO;
+import com.bybud.common.dto.UserDTO;
 import com.bybud.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +23,16 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
-        UserDTO user = userService.createUser(createUserDTO);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.createUser(createUserDTO));
     }
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        UserDTO user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 }

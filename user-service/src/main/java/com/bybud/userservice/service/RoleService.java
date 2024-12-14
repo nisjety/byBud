@@ -1,9 +1,9 @@
 package com.bybud.userservice.service;
 
-import com.bybud.userservice.dto.RoleDTO;
-import com.bybud.userservice.model.AppRole;
+import com.bybud.common.dto.RoleDTO;
+import com.bybud.common.model.Role;
 import com.bybud.common.model.RoleName;
-import com.bybud.userservice.repository.AppRoleRepository;
+import com.bybud.common.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,33 +13,33 @@ import java.util.stream.Collectors;
 @Service
 public class RoleService {
 
-    private final AppRoleRepository appRoleRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public RoleService(AppRoleRepository appRoleRepository) {
-        this.appRoleRepository = appRoleRepository;
+    public RoleService(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
     }
 
     public List<RoleDTO> getAllRoles() {
-        return appRoleRepository.findAll()
+        return roleRepository.findAll()
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
     public RoleDTO createRole(RoleDTO roleDTO) {
-        if (appRoleRepository.existsByName(RoleName.valueOf(roleDTO.getName()))) {
+        if (roleRepository.existsByName(RoleName.valueOf(roleDTO.getName()))) {
             throw new IllegalArgumentException("Role already exists");
         }
 
-        AppRole role = new AppRole();
+        Role role = new Role();
         role.setName(RoleName.valueOf(roleDTO.getName()));
-        AppRole savedRole = appRoleRepository.save(role);
+        Role savedRole = roleRepository.save(role);
 
         return mapToDTO(savedRole);
     }
 
-    private RoleDTO mapToDTO(AppRole role) {
+    private RoleDTO mapToDTO(Role role) {
         RoleDTO roleDTO = new RoleDTO();
         roleDTO.setId(role.getId());
         roleDTO.setName(role.getName().name());

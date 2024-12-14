@@ -1,12 +1,13 @@
 package com.bybud.authservice.controller;
 
-import com.bybud.authservice.dto.*;
-import com.bybud.authservice.model.AuthUser;
 import com.bybud.authservice.service.AuthService;
+import com.bybud.common.dto.JwtResponse;
+import com.bybud.common.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,20 +20,28 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@RequestParam String username,
+                                      @RequestParam String email,
+                                      @RequestParam String password,
+                                      @RequestParam String fullName,
+                                      @RequestParam String dateOfBirth, // Expecting date in ISO format (yyyy-MM-dd)
+                                      @RequestParam String role) {
         try {
-            AuthUser newUser = authService.register(registerRequest);
-            JwtResponse jwtResponse = authService.login(new LoginRequest(newUser.getUsername(), registerRequest.getPassword()));
-            return ResponseEntity.ok(jwtResponse);
+            LocalDate dob = LocalDate.parse(dateOfBirth); // Parse dateOfBirth
+            User newUser = authService.register(username, email, password, fullName, dob, role);
+            return ResponseEntity.ok("User registered successfully with ID: " + newUser.getId());
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format for dateOfBirth. Expected format: yyyy-MM-dd.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestParam String usernameOrEmail,
+                                   @RequestParam String password) {
         try {
-            JwtResponse jwtResponse = authService.login(loginRequest);
+            JwtResponse jwtResponse = authService.login(usernameOrEmail, password);
             return ResponseEntity.ok(jwtResponse);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -40,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
+    public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
         try {
             JwtResponse jwtResponse = authService.refreshToken(refreshToken);
             return ResponseEntity.ok(jwtResponse);
@@ -50,10 +59,9 @@ public class AuthController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<?> getUserDetails() {
+    public ResponseEntity<?> getUserDetails(@RequestParam String usernameOrEmail) {
         try {
-            String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            JwtResponse jwtResponse = authService.getUserDetails(username);
+            JwtResponse jwtResponse = authService.getUserDetails(usernameOrEmail);
             return ResponseEntity.ok(jwtResponse);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

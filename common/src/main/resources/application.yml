@@ -1,29 +1,9 @@
-server:
-  port: 8081
+# common/application.yml
 
-# Datasource Configuration
-spring:
-  datasource:
-    name: auth-service
-    url: jdbc:h2:mem:bybud_auth
-    driver-class-name: org.h2.Driver
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    h2.console.enabled: true
 
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate.ddl-auto: update
-    show-sql: true
-
-  h2:
-    console:
-      path: /h2-console
-
-# JWT Configuration
-ByBud:
+bybud:
   app:
-    jwtSecret: ${JWT_SECRET}
-    jwtRefreshSecret: ${JWT_REFRESH_SECRET}
-    jwtExpirationMs: ${JWT_EXPIRATION_MS}
-    jwtRefreshExpirationMs: ${JWT_REFRESH_EXPIRATION_MS}
+    jwtSecret: R9uvesizQpPFmDWcFGmoB0RIpN84cEWLzwE5GjAOyfE=
+    jwtRefreshSecret: R9uvesizQpPFmDWcFGmoB0RIpN84cEWLzwE5GjAOyfE@abcdefgh1234567890
+    jwtExpirationMs: 86400000
+    jwtRefreshExpirationMs: 8640000
