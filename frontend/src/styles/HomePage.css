@@ -1,8 +1,11 @@
 .home-page {
     max-width: 600px;
-    margin: 0 auto;
+    margin: 50px auto;
     padding: 20px;
     text-align: center;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tab-container {
@@ -16,9 +19,18 @@
     margin: 0 5px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, color 0.3s;
+    background-color: #f1f1f1;
+    color: #333;
+    border-radius: 4px;
 }
 
 .tab.active {
     background-color: #007bff;
+    color: #fff;
+}
+
+.tab:hover {
+    background-color: #0056b3;
+    color: #fff;
 }

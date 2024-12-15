@@ -1,13 +1,12 @@
-package com.bybud.common.utility;
+package com.bybud.common.security;
 
 import com.bybud.common.model.Role;
 import com.bybud.common.model.RoleName;
 import com.bybud.common.repository.RoleRepository;
+import com.bybud.common.utility.RoleInitializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 

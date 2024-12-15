@@ -1,15 +1,12 @@
-/** @type {import('jest').Config} */
 export default {
-    setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'], // Include the setup file
+    setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
     transform: {
-        '^.+\\.[tj]sx?$': 'babel-jest', // Use Babel for transforming JS/TSX files
+        '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@babel/preset-env', '@babel/preset-react'] }],
     },
-    testEnvironment: 'jsdom', // Simulate browser-like environment
+    extensionsToTreatAsEsm: ['.jsx'],
+    testEnvironment: '<rootDir>/customJestEnvironment.js',
     moduleNameMapper: {
-        '\\.(css|less|scss|sass)$': 'identity-obj-proxy', // Mock CSS imports
+        '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     },
-    testMatch: [
-        '**/?(*.)+(spec|test).[tj]s?(x)', // Look for test and spec files
-        '**/?(*.)+(spec|test).mjs',      // Include .mjs test files explicitly
-    ],
+    testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
 };

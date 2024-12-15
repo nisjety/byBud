@@ -1,16 +1,20 @@
 server:
-  port: 8081
+  port: 8083
 
 spring:
+  config:
+    activate:
+      on-profile: user-service
+
   datasource:
     name: user-service
     url: jdbc:h2:mem:bybud_user
-    driver-class-name: org.h2.Driver
     username: root
     password: password
-    h2:
-      console:
-        enabled: true
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -21,3 +25,4 @@ spring:
 logging:
   level:
     root: DEBUG
+

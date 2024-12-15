@@ -1,56 +1,47 @@
-import { useEffect, useState } from 'react';
-import { getDeliveriesForCustomer } from '../services/DeliveryService';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { getDeliveriesForCustomer } from "../services/DeliveryService";
 
-const useCustomerDeliveries = () => {
+const DeliveryList = () => {
     const [deliveries, setDeliveries] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDeliveries = async () => {
-            const token = localStorage.getItem('token');
-            const customerId = localStorage.getItem('customerId'); // Ensure this is set after login
-            if (!token || !customerId) {
-                navigate('/login');
-                return;
-            }
-
             try {
-                const deliveriesData = await getDeliveriesForCustomer(customerId, token);
-                setDeliveries(deliveriesData);
-            } catch (error) {
-                setError(error.response?.data?.message || error.message);
+                const customerId = localStorage.getItem("customerId");
+                if (!customerId) throw new Error("Customer ID not found. Please log in again.");
+
+                const data = await getDeliveriesForCustomer(customerId);
+                setDeliveries(data); // Aligns with List<DeliveryResponse>
+            } catch (err) {
+                setError(`Failed to fetch deliveries: ${err.message}`);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchDeliveries();
-    }, [navigate]);
+    }, []);
 
-    return { deliveries, error, loading };
-};
-
-const DeliveryList = () => {
-    const { deliveries, error, loading } = useCustomerDeliveries();
-
-    if (loading) {
-        return <div>Loading deliveries...</div>;
-    }
+    if (loading) return <p data-testid="loading">Loading deliveries...</p>;
+    if (error) return <p style={{ color: "red" }} data-testid="error">{error}</p>;
 
     return (
         <div>
             <h2>Your Deliveries</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
             {deliveries.length === 0 ? (
-                <p>No deliveries found.</p>
+                <p data-testid="no-deliveries">No deliveries found.</p>
             ) : (
                 <ul>
                     {deliveries.map((delivery) => (
-                        <li key={delivery.id}>
-                            <strong>{delivery.deliveryDetails || 'No details available'}</strong> - Status: {delivery.status}
+                        <li key={delivery.id} data-testid={`delivery-${delivery.id}`}>
+                            <strong>Details:</strong> {delivery.deliveryDetails} <br />
+                            <strong>Status:</strong> {delivery.status} <br />
+                            <strong>Courier:</strong> {delivery.courierId || "Not assigned"} <br />
+                            <strong>Created:</strong> {delivery.createdDate
+                            ? new Date(delivery.createdDate).toLocaleString()
+                            : "Unknown"}
                         </li>
                     ))}
                 </ul>
@@ -58,6 +49,5 @@ const DeliveryList = () => {
         </div>
     );
 };
-
 
 export default DeliveryList;

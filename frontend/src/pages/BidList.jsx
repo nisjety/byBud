@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getBidsForDelivery } from '../services/DeliveryService';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getBidsForDelivery } from "../services/DeliveryService";
 
-const useBids = (deliveryId) => {
+const BidList = () => {
+    const { deliveryId } = useParams();
     const [bids, setBids] = useState([]);
     const [error, setError] = useState(null);
 
@@ -11,30 +12,19 @@ const useBids = (deliveryId) => {
 
         const fetchBids = async () => {
             try {
-                const bidsData = await getBidsForDelivery(Number(deliveryId));
+                const bidsData = await getBidsForDelivery(deliveryId); // Matches BidRequest
                 setBids(bidsData);
             } catch (err) {
-                setError(err);
+                setError(err.message || "Failed to fetch bids.");
             }
         };
 
         fetchBids();
     }, [deliveryId]);
 
-    return { bids, error };
-};
+    if (!deliveryId) return <div>Delivery ID is missing!</div>;
 
-const BidList = () => {
-    const { deliveryId } = useParams();
-    const { bids, error } = useBids(deliveryId);
-
-    if (!deliveryId) {
-        return <div>Delivery ID is missing!</div>;
-    }
-
-    if (error) {
-        return <div>Failed to fetch bids: {error.message}</div>;
-    }
+    if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
     return (
         <div>
@@ -44,9 +34,9 @@ const BidList = () => {
             ) : (
                 <ul>
                     {bids.map((bid) => (
-                        <li key={bid.id}>
-                            <strong>Courier:</strong> {bid.courierId || 'Unknown'} <br />
-                            <strong>Note:</strong> {bid.note || 'No note provided'}
+                        <li key={bid.id} data-testid={`bid-item-${bid.id}`}>
+                            <strong>Courier:</strong> {bid.courierId || "Unknown"} <br />
+                            <strong>Note:</strong> {bid.note || "No note provided"}
                         </li>
                     ))}
                 </ul>

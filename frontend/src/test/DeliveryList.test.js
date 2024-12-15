@@ -3,7 +3,6 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import DeliveryList from '../pages/DeliveryList';
 import { getDeliveriesForCustomer } from '../services/DeliveryService';
 import { BrowserRouter } from 'react-router-dom';
-import { jest } from '@jest/globals';
 
 jest.mock('../services/DeliveryService', () => ({
     getDeliveriesForCustomer: jest.fn(),
@@ -23,15 +22,13 @@ const mockDeliveries = [
 ];
 
 describe('DeliveryList Component', () => {
-    const mockToken = 'mockToken';
-    const mockCustomerId = '123';
-
     beforeEach(() => {
-        localStorage.setItem('token', mockToken); // Mock the token
+        localStorage.setItem('customerId', '123'); // Set customerId in localStorage
     });
 
     afterEach(() => {
         jest.clearAllMocks(); // Clear mocks after each test
+        localStorage.clear(); // Clear localStorage after each test
     });
 
     test('renders deliveries successfully', async () => {
@@ -39,7 +36,7 @@ describe('DeliveryList Component', () => {
 
         render(
             <BrowserRouter>
-                <DeliveryList customerId={mockCustomerId} />
+                <DeliveryList />
             </BrowserRouter>
         );
 
@@ -64,7 +61,7 @@ describe('DeliveryList Component', () => {
 
         render(
             <BrowserRouter>
-                <DeliveryList customerId={mockCustomerId} />
+                <DeliveryList />
             </BrowserRouter>
         );
 
@@ -83,7 +80,7 @@ describe('DeliveryList Component', () => {
 
         render(
             <BrowserRouter>
-                <DeliveryList customerId={mockCustomerId} />
+                <DeliveryList />
             </BrowserRouter>
         );
 
@@ -99,5 +96,18 @@ describe('DeliveryList Component', () => {
                 expect(items[index]).toHaveTextContent(delivery.status);
             });
         });
+    });
+
+    test('shows error if customerId is missing', () => {
+        localStorage.removeItem('customerId'); // Remove customerId to simulate the missing condition
+
+        render(
+            <BrowserRouter>
+                <DeliveryList />
+            </BrowserRouter>
+        );
+
+        // Wait for the error message to appear
+        expect(screen.getByText(/Customer ID not found/i)).toBeInTheDocument();
     });
 });

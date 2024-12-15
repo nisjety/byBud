@@ -1,58 +1,38 @@
-import {useState} from 'react';
-import {login} from '../services/AuthService';
-
-const API_ENDPOINT = '/api/auth/login';
-const REDIRECT_URL = '/delivery';
-
-import PropTypes from 'prop-types';
-
-const InputField = ({type, placeholder, value, onChange, required}) => (
-    <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-    />
-);
-
-InputField.propTypes = {
-    type: PropTypes.string.isRequired,
-    placeholder: PropTypes.string,
-    value: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    required: PropTypes.bool
-};
+import React, { useState } from "react";
+import { login } from "../services/AuthService";
 
 const Login = () => {
-    const [identifier, setIdentifier] = useState('');
-    const [password, setPassword] = useState('');
+    const [identifier, setIdentifier] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const data = await login(identifier, password, API_ENDPOINT);
-            localStorage.setItem('token', data.accessToken);
-            alert('Login successful!');
-            window.location.href = REDIRECT_URL;
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message;
-            alert(`Login failed: ${errorMessage}. ${errorMessage === 'Network Error' ? 'Please check your internet connection.' : ''}`);
+            const { accessToken, refreshToken, roles } = await login(identifier, password); // Handle `AuthResponse`
+            localStorage.setItem("token", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            localStorage.setItem("roles", JSON.stringify(roles)); // Store roles if needed
+            alert("Login successful!");
+            window.location.href = "/delivery";
+        } catch (err) {
+            setError(err.response?.data?.message || "Login failed.");
         }
     };
 
     return (
         <div>
             <h2>Login</h2>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <form onSubmit={handleSubmit}>
-                <InputField
+                <input
                     type="text"
                     placeholder="Username or Email"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
                 />
-                <InputField
+                <input
                     type="password"
                     placeholder="Password"
                     value={password}
