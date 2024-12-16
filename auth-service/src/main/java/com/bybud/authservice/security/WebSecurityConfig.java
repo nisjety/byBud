@@ -2,6 +2,8 @@ package com.bybud.authservice.security;
 
 import com.bybud.common.security.AuthTokenFilter;
 import com.bybud.common.security.JwtTokenProvider;
+import com.bybud.common.security.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +22,8 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, JwtTokenProvider jwtTokenProvider) {
+    public WebSecurityConfig(@Qualifier("authUserDetailsService") UserDetailsServiceImpl userDetailsServiceImpl,
+                             JwtTokenProvider jwtTokenProvider) {
         this.userDetailsServiceImpl = userDetailsServiceImpl;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -34,7 +37,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -44,12 +47,12 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

@@ -7,12 +7,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "com.bybud.authservice")
-@EntityScan(basePackages = "com.bybud.deliveryservice.model")
 @ComponentScan(basePackages = {"com.bybud.authservice", "com.bybud.common"})
+@EnableJpaRepositories(basePackages = "com.bybud.authservice")
+@EntityScan(basePackages = "com.bybud.common.model")
 public class AuthServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthServiceApplication.class, args);
     }
 }
+
+
+
 

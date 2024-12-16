@@ -24,8 +24,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final AuthenticationManager authenticationManager;
 
     public AuthService(UserRepository userRepository,
                        RoleRepository roleRepository,
@@ -58,17 +59,32 @@ public class AuthService {
     }
 
     public JwtResponse login(String usernameOrEmail, String password) {
-        authenticate(usernameOrEmail, password);
+        try {
+            authenticate(usernameOrEmail, password);
 
-        User user = userRepository.findByUsername(usernameOrEmail)
-                .or(() -> userRepository.findByEmail(usernameOrEmail))
-                .orElseThrow(() -> new IllegalArgumentException("Bad credentials"));
+            User user = userRepository.findByUsername(usernameOrEmail)
+                    .or(() -> userRepository.findByEmail(usernameOrEmail))
+                    .orElseThrow(() -> new IllegalArgumentException("Bad credentials"));
 
-        String accessToken = jwtTokenProvider.generateJwtToken(user.getUsername());
-        String refreshToken = jwtTokenProvider.generateJwtRefreshToken(user.getUsername());
+            String accessToken = jwtTokenProvider.generateJwtToken(user.getUsername());
+            String refreshToken = jwtTokenProvider.generateJwtRefreshToken(user.getUsername());
 
-        return createJwtResponse(user, accessToken, refreshToken);
+            return createJwtResponse(user, accessToken, refreshToken);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Bad credentials");
+        }
     }
+
+    private void authenticate(String usernameOrEmail, String password) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(usernameOrEmail, password)
+            );
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Authentication failed for: " + usernameOrEmail);
+        }
+    }
+
 
     public JwtResponse refreshToken(String refreshToken) {
         if (!jwtTokenProvider.validateJwtRefreshToken(refreshToken)) {
@@ -90,12 +106,6 @@ public class AuthService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with username or email: " + usernameOrEmail));
 
         return createJwtResponse(user, null, null);
-    }
-
-    private void authenticate(String usernameOrEmail, String password) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(usernameOrEmail, password)
-        );
     }
 
     private JwtResponse createJwtResponse(User user, String accessToken, String refreshToken) {

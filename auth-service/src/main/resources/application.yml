@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8081  # Unique port for auth-service
 
 spring:
   config:
@@ -7,20 +7,32 @@ spring:
       on-profile: auth-service
 
   datasource:
-    name: auth-service
+    driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:bybud_auth
-    username: root
+    username: ROOT
     password: password
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
+    h2:
+      console:
+        enabled: true
+        path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update  # Adjust for development/testing
+
+logging:
+  level:
+    root: debug
+    org.springframework.security: DEBUG
+
+
 
 bybud:
   app:
-    jwtSecret: auth-secret
-    jwtRefreshSecret: auth-refresh-secret
+    jwtSecret: f4c3e5a35fa33f64f102d721a4d5c160e357fa970ce4a5f8646ab7e748d85785afbe7d438c6745d202102a7c76989c86562abdb458af9a1d0838d227d1ec35cff2cc77f03bab5735f37a39f7689aa2a3c3c0549624c907959e524d7f4441474ba06f50c61308572cbc95dd86a2a14da00186b846b72990b06bc9ff1a8b29868be159fd2c55abc14519f1a326ff1faa5aeed8e247c1ed89047593ad0a46c2c13f3e074fb44848a12aaa1001687728cdaf55a5d14d94a0dcae2aad2e6b9938af201bff9787eac96c6e8621884cc031097f41660908bebc8a7c759449b909ae91e253eb723499633fb6fb0e148ba87fa1c90ab5976a4eb71e62a03a88a79194641b
+    jwtRefreshSecret: f4c3e5a35fa33f64f102d721a4d5c160e357fa970ce4a5f8646ab7e748d85785afbe7d438c6745d202102a7c76989c86562abdb458af9a1d0838d227d1ec35cff2cc77f03bab5735f37a39f7689aa2a3c3c0549624c907959e524d7f4441474ba06f50c61308572cbc95dd86a2a14da00186b846b72990b06bc9ff1a8b29868be159fd2c55abc14519f1a326ff1faa5aeed8e247c1ed89047593ad0a46c2c13f3e074fb44848a12aaa1001687728cdaf55a5d14d94a0dcae2aad2e6b9938af201bff9787eac96c6e8621884cc031097f41660908bebc8a7c759449b909ae91e253eb723499633fb6fb0e148ba87fa1c90ab5976a4eb71e62a03a88a79194641b
     jwtExpirationMs: 86400000
-    jwtRefreshExpirationMs: 172800000
+    jwtRefreshExpirationMs: 8640000
 
+auth-service-specific-property: value
 
