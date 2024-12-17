@@ -7,10 +7,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service("customUserDetailsService")
-@Profile("delivery-service") // Only active for the delivery-service profile
+@Profile("delivery-service") // Active only in the 'delivery-service' profile
 public class NoOpUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        throw new UsernameNotFoundException("UserDetailsService is not available in delivery-service");
+        throw new UsernameNotFoundException("UserDetailsService is not active in this profile");
     }
 }

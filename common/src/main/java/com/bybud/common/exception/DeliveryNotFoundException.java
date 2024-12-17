@@ -1,4 +1,4 @@
-package com.bybud.deliveryservice.exception;
+package com.bybud.common.exception;
 
 public class DeliveryNotFoundException extends RuntimeException {
 

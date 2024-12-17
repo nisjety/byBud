@@ -1,102 +1,60 @@
 package com.bybud.deliveryservice.model;
 
+import com.bybud.common.model.BaseEntity;
 import com.bybud.common.model.DeliveryStatus;
+import com.bybud.common.model.User;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "deliveries")
-public class Delivery {
+public class Delivery extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private User customer;
 
-    @Column(nullable = false)
-    private String customerId; // Customer who created the delivery request
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "courier_id")
+    private User courier;
 
-    @Column
-    private String courierId; // Courier assigned to the delivery
+    @Column(name = "delivery_details", nullable = false)
+    private String deliveryDetails;
 
-    @Column(nullable = false)
-    private String deliveryDetails; // Description of the delivery
+    @Column(name = "delivery_address", nullable = false)
+    private String deliveryAddress;
+
+    @Column(name = "pickup_address", nullable = false)
+    private String pickupAddress;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DeliveryStatus status; // Current status of the delivery
+    @Column(name = "status", nullable = false)
+    private DeliveryStatus status = DeliveryStatus.CREATED;
 
-    @Column(nullable = false)
-    private LocalDateTime createdDate; // When the delivery request was created
-
-    @Column
-    private LocalDateTime updatedDate; // Last updated timestamp
-
-    // Default Constructor
     public Delivery() {}
 
-    // Parameterized Constructor
-    public Delivery(String customerId, String deliveryDetails) {
-        this.customerId = customerId;
+    public Delivery(User customer, String deliveryDetails, String pickupAddress, String deliveryAddress) {
+        this.customer = customer;
         this.deliveryDetails = deliveryDetails;
-        this.status = DeliveryStatus.PENDING;
-        this.createdDate = LocalDateTime.now();
+        this.pickupAddress = pickupAddress;
+        this.deliveryAddress = deliveryAddress;
+        this.status = DeliveryStatus.CREATED;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    public User getCustomer() { return customer; }
+    public void setCustomer(User customer) { this.customer = customer; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public User getCourier() { return courier; }
+    public void setCourier(User courier) { this.courier = courier; }
 
-    public String getCustomerId() {
-        return customerId;
-    }
+    public String getDeliveryDetails() { return deliveryDetails; }
+    public void setDeliveryDetails(String deliveryDetails) { this.deliveryDetails = deliveryDetails; }
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
+    public String getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
 
-    public String getCourierId() {
-        return courierId;
-    }
+    public String getPickupAddress() { return pickupAddress; }
+    public void setPickupAddress(String pickupAddress) { this.pickupAddress = pickupAddress; }
 
-    public void setCourierId(String courierId) {
-        this.courierId = courierId;
-    }
-
-    public String getDeliveryDetails() {
-        return deliveryDetails;
-    }
-
-    public void setDeliveryDetails(String deliveryDetails) {
-        this.deliveryDetails = deliveryDetails;
-    }
-
-    public DeliveryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(DeliveryStatus status) {
-        this.status = status;
-        this.updatedDate = LocalDateTime.now();
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LocalDateTime getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(LocalDateTime updatedDate) {
-        this.updatedDate = updatedDate;
-    }
+    public DeliveryStatus getStatus() { return status; }
+    public void setStatus(DeliveryStatus status) { this.status = status; }
 }

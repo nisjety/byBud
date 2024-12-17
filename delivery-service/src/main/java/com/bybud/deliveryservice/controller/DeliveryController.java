@@ -1,7 +1,9 @@
 package com.bybud.deliveryservice.controller;
 
-import com.bybud.deliveryservice.dto.*;
-import com.bybud.deliveryservice.model.CourierBid;
+import com.bybud.common.dto.BaseResponse;
+import com.bybud.common.model.DeliveryStatus;
+import com.bybud.deliveryservice.dto.CreateDeliveryRequest;
+import com.bybud.deliveryservice.dto.DeliveryResponse;
 import com.bybud.deliveryservice.service.DeliveryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,46 +21,50 @@ public class DeliveryController {
         this.deliveryService = deliveryService;
     }
 
-    // Create a new delivery
     @PostMapping
-    public ResponseEntity<DeliveryResponse> createDelivery(@Valid @RequestBody CreateDeliveryRequest request) {
-        DeliveryResponse response = deliveryService.createDelivery(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BaseResponse<DeliveryResponse>> createDelivery(@Valid @RequestBody CreateDeliveryRequest request,
+                                                                         @RequestHeader("Authorization") String authHeader) {
+        String jwtToken = extractJwtFromHeader(authHeader);
+        DeliveryResponse response = deliveryService.createDelivery(request, jwtToken);
+        return ResponseEntity.ok(BaseResponse.success("Delivery created successfully.", response));
     }
 
-    // Get all deliveries for a customer
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<DeliveryResponse>> getDeliveriesForCustomer(@PathVariable String customerId) {
-        List<DeliveryResponse> deliveries = deliveryService.getDeliveriesForCustomer(customerId);
-        return ResponseEntity.ok(deliveries);
+    @GetMapping
+    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getDeliveries(@RequestHeader("Authorization") String authHeader) {
+        String jwtToken = extractJwtFromHeader(authHeader);
+        List<DeliveryResponse> deliveries = deliveryService.getDeliveries(jwtToken);
+        return ResponseEntity.ok(BaseResponse.success("Deliveries fetched successfully.", deliveries));
     }
 
-    // Get all deliveries for a courier
-    @GetMapping("/courier/{courierId}")
-    public ResponseEntity<List<DeliveryResponse>> getDeliveriesForCourier(@PathVariable String courierId) {
-        List<DeliveryResponse> deliveries = deliveryService.getDeliveriesForCourier(courierId);
-        return ResponseEntity.ok(deliveries);
+    @PutMapping("/{deliveryId}/accept")
+    public ResponseEntity<BaseResponse<DeliveryResponse>> acceptDelivery(@PathVariable Long deliveryId,
+                                                                         @RequestHeader("Authorization") String authHeader) {
+        String jwtToken = extractJwtFromHeader(authHeader);
+        DeliveryResponse response = deliveryService.acceptDelivery(deliveryId, jwtToken);
+        return ResponseEntity.ok(BaseResponse.success("Delivery accepted successfully.", response));
     }
 
-    // Place a bid on a delivery
-    @PostMapping("/bid")
-    public ResponseEntity<String> placeBid(@Valid @RequestBody BidRequest request) {
-        deliveryService.placeBid(request);
-        return ResponseEntity.ok("Bid placed successfully");
+    @PutMapping("/{deliveryId}/status")
+    public ResponseEntity<BaseResponse<DeliveryResponse>> updateDeliveryStatus(@PathVariable Long deliveryId,
+                                                                               @RequestParam DeliveryStatus status,
+                                                                               @RequestHeader("Authorization") String authHeader) {
+        String jwtToken = extractJwtFromHeader(authHeader);
+        DeliveryResponse response = deliveryService.updateDeliveryStatus(deliveryId, status, jwtToken);
+        return ResponseEntity.ok(BaseResponse.success("Delivery status updated successfully.", response));
     }
 
-    // Get all bids for a delivery
-    @GetMapping("/{deliveryId}/bids")
-    public ResponseEntity<List<CourierBid>> getBidsForDelivery(@PathVariable Long deliveryId) {
-        List<CourierBid> bids = deliveryService.getBidsForDelivery(deliveryId);
-        return ResponseEntity.ok(bids);
+    @GetMapping("/admin/all")
+    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getAllDeliveriesForAdmin(@RequestHeader("Authorization") String authHeader) {
+        String jwtToken = extractJwtFromHeader(authHeader);
+        List<DeliveryResponse> deliveries = deliveryService.getAllDeliveriesForAdmin(jwtToken);
+        return ResponseEntity.ok(BaseResponse.success("All deliveries fetched successfully for admin.", deliveries));
     }
 
-    // Update delivery status or assign a courier
-    @PutMapping("/{deliveryId}")
-    public ResponseEntity<DeliveryResponse> updateDelivery(@PathVariable Long deliveryId,
-                                                           @Valid @RequestBody UpdateDeliveryRequest request) {
-        DeliveryResponse response = deliveryService.updateDelivery(deliveryId, request);
-        return ResponseEntity.ok(response);
+    // Helper to extract JWT from Authorization header
+    private String extractJwtFromHeader(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        throw new IllegalArgumentException("Authorization header is invalid or missing.");
     }
 }

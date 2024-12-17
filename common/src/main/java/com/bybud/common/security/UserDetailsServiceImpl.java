@@ -1,21 +1,16 @@
-package com.bybud.authservice.security;
+package com.bybud.common.security;
 
 import com.bybud.common.model.User;
 import com.bybud.common.repository.UserRepository;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
-@Service("authUserDetailsService")
-@Profile("auth-service") // Load only in the "auth-service" profile
-@Primary
-public class UserDetailsServiceImpl implements UserDetailsService {
+@Service
+public class UserDetailsServiceImpl implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -34,7 +29,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .username(user.getUsername())
                 .password(user.getPassword())
                 .authorities(user.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                        // role is now a RoleName enum, so just use role.name()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                         .collect(Collectors.toList()))
                 .accountExpired(false)
                 .accountLocked(false)

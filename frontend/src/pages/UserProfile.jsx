@@ -8,21 +8,22 @@ const UserProfile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const userId = localStorage.getItem("userId");
-                if (!userId) throw new Error("User ID not found. Please log in again.");
-                const data = await getUserProfile(userId);
-                setProfile(data);
-                setFormData(data);
-            } catch (err) {
-                setError(err.message || "Failed to fetch profile.");
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchProfile = async () => {
+        try {
+            setLoading(true);
+            const userId = localStorage.getItem("userId");
+            if (!userId) throw new Error("User ID not found. Please log in again.");
+            const data = await getUserProfile(userId);
+            setProfile(data);
+            setFormData(data);
+        } catch (err) {
+            setError(err.response?.data?.error || err.message || "Failed to fetch profile.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchProfile();
     }, []);
 
@@ -39,7 +40,7 @@ const UserProfile = () => {
             setEditable(false);
             setError(null);
         } catch (err) {
-            setError(err.message || "Failed to update profile.");
+            setError(err.response?.data?.error || "Failed to update profile.");
         }
     };
 
@@ -48,6 +49,7 @@ const UserProfile = () => {
         return (
             <div role="alert" style={{ color: "red" }}>
                 {error}
+                <button onClick={fetchProfile}>Retry</button>
             </div>
         );
 

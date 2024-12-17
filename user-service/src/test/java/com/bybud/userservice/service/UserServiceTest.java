@@ -1,17 +1,16 @@
 package com.bybud.userservice.service;
 
+import com.bybud.common.dto.CreateUserDTO;
 import com.bybud.common.dto.UserDTO;
-import com.bybud.common.model.Role;
+import com.bybud.common.exception.UserNotFoundException;
 import com.bybud.common.model.RoleName;
 import com.bybud.common.model.User;
-import com.bybud.common.repository.RoleRepository;
 import com.bybud.common.repository.UserRepository;
-import com.bybud.userservice.dto.CreateUserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,16 +21,14 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     private UserRepository userRepository;
-    private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private UserService userService;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
-        roleRepository = mock(RoleRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        userService = new UserService(userRepository, roleRepository, passwordEncoder);
+        userService = new UserService(userRepository, passwordEncoder);
     }
 
     @Test
@@ -39,21 +36,25 @@ class UserServiceTest {
         // Arrange
         CreateUserDTO createUserDTO = new CreateUserDTO();
         createUserDTO.setUsername("testuser");
+        createUserDTO.setFullName("Test User");
         createUserDTO.setEmail("test@example.com");
         createUserDTO.setPassword("password123");
+        createUserDTO.setDateOfBirth(LocalDate.of(1990, 1, 1));
+        createUserDTO.setRoleName(RoleName.COURIER);
+        createUserDTO.setPhoneNumber("1234567890");
 
-        Role customerRole = new Role(RoleName.ROLE_CUSTOMER);
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(roleRepository.findByName(RoleName.ROLE_CUSTOMER)).thenReturn(Optional.of(customerRole));
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
         User savedUser = new User();
-        savedUser.setId(1L);
         savedUser.setUsername("testuser");
+        savedUser.setFullName("Test User");
         savedUser.setEmail("test@example.com");
         savedUser.setPassword("encodedPassword");
-        savedUser.setRoles(Set.of(customerRole));
+        savedUser.setDateOfBirth(LocalDate.of(1990, 1, 1));
+        savedUser.setRoles(Set.of(RoleName.COURIER));
+        savedUser.setActive(true);
 
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -63,8 +64,10 @@ class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("testuser", result.getUsername());
+        assertEquals("Test User", result.getFullName());
         assertEquals("test@example.com", result.getEmail());
-        assertTrue(result.getRoles().contains("ROLE_CUSTOMER"));
+        assertEquals(LocalDate.of(1990, 1, 1), result.getDateOfBirth());
+        assertTrue(result.getRoles().contains(RoleName.COURIER));
 
         verify(userRepository, times(1)).save(any(User.class));
     }
@@ -81,7 +84,7 @@ class UserServiceTest {
                 IllegalArgumentException.class,
                 () -> userService.createUser(createUserDTO)
         );
-        assertEquals("Username is already in use", exception.getMessage());
+        assertEquals("Username is already in use.", exception.getMessage());
 
         verify(userRepository, never()).save(any(User.class));
     }
@@ -98,7 +101,7 @@ class UserServiceTest {
                 IllegalArgumentException.class,
                 () -> userService.createUser(createUserDTO)
         );
-        assertEquals("Email is already in use", exception.getMessage());
+        assertEquals("Email is already in use.", exception.getMessage());
 
         verify(userRepository, never()).save(any(User.class));
     }
@@ -107,12 +110,10 @@ class UserServiceTest {
     void testGetAllUsers() {
         // Arrange
         User user1 = new User();
-        user1.setId(1L);
         user1.setUsername("testuser1");
         user1.setEmail("test1@example.com");
 
         User user2 = new User();
-        user2.setId(2L);
         user2.setUsername("testuser2");
         user2.setEmail("test2@example.com");
 
@@ -128,4 +129,34 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findAll();
     }
+
+    @Test
+    void testGetUserById_NotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(99L));
+    }
+
+    @Test
+    void testGetUserDetails_Username() {
+        User user = new User();
+        user.setUsername("johndoe");
+        user.setEmail("johndoe@example.com");
+        when(userRepository.findByUsername("johndoe")).thenReturn(Optional.of(user));
+
+        UserDTO dto = userService.getUserDetails("johndoe");
+        assertEquals("johndoe", dto.getUsername());
+    }
+
+    @Test
+    void testGetUserDetails_Email() {
+        User user = new User();
+        user.setUsername("janedoe");
+        user.setEmail("jane@example.com");
+        when(userRepository.findByEmail("jane@example.com")).thenReturn(Optional.of(user));
+
+        UserDTO dto = userService.getUserDetails("jane@example.com");
+        assertEquals("janedoe", dto.getUsername());
+    }
 }
+

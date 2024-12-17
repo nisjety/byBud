@@ -1,32 +1,37 @@
 package com.bybud.deliveryservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CreateDeliveryRequest {
 
-    @NotBlank(message = "Customer ID is required.")
-    @Size(max = 50, message = "Customer ID cannot exceed 50 characters.")
-    private String customerId;
+    @NotNull(message = "Customer ID is required.")
+    private Long customerId;
 
     @NotBlank(message = "Delivery details are required.")
     @Size(max = 255, message = "Delivery details cannot exceed 255 characters.")
     private String deliveryDetails;
 
-    // Getters and Setters
-    public String getCustomerId() {
-        return customerId;
-    }
+    @NotBlank(message = "Delivery address is required.")
+    @Size(max = 255, message = "Delivery address cannot exceed 255 characters.")
+    private String deliveryAddress;
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
+    @NotBlank(message = "Pickup address is required.")
+    @Size(max = 255, message = "Pickup address cannot exceed 255 characters.")
+    private String pickupAddress;
 
-    public String getDeliveryDetails() {
-        return deliveryDetails;
-    }
+    public Long getCustomerId() { return customerId; }
+    public void setCustomerId(Long customerId) { this.customerId = customerId; }
 
-    public void setDeliveryDetails(String deliveryDetails) {
-        this.deliveryDetails = deliveryDetails;
-    }
+    public String getDeliveryDetails() { return deliveryDetails; }
+    public void setDeliveryDetails(String deliveryDetails) { this.deliveryDetails = deliveryDetails; }
+
+    public String getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
+
+    public String getPickupAddress() { return pickupAddress; }
+    public void setPickupAddress(String pickupAddress) { this.pickupAddress = pickupAddress; }
 }

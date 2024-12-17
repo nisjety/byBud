@@ -2,13 +2,24 @@
 server:
   port: 8080
 
+auth-service:
+    url: http://localhost:8081
+delivery-service:
+    url: http://localhost:8082
+user-service:
+    url: http://localhost:8083
+
+rest:
+  template:
+    connectTimeout: 5000
+    readTimeout: 5000
+
 spring:
   datasource:
     driver-class-name: org.h2.Driver
     h2:
       console:
         enabled: true
-        path: /h2-console
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:

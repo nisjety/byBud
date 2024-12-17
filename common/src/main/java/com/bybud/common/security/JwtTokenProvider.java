@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -86,6 +87,16 @@ public class JwtTokenProvider {
                 .getPayload()
                 .getSubject();
     }
+
+    public String getRolesFromJwt(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey(jwtSecret))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("roles", String.class);
+    }
+
 
     // Extract Username from Refresh Token
     public String getUsernameFromJwtRefreshToken(String token) {

@@ -10,10 +10,10 @@ const CreateDelivery = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const customerId = localStorage.getItem("customerId"); // Ensure customerId is stored
+            const customerId = localStorage.getItem("customerId");
             if (!customerId) throw new Error("Customer ID not found. Please log in again.");
 
-            await createDelivery({ customerId, deliveryDetails }); // Align with CreateDeliveryRequest DTO
+            await createDelivery({ customerId, deliveryDetails });
             alert("Delivery request created successfully!");
             setDeliveryDetails("");
         } catch (err) {

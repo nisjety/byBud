@@ -1,19 +1,23 @@
 package com.bybud.common.dto;
 
-import java.util.List;
+import com.bybud.common.model.RoleName;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Set;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class JwtResponse {
+    private String accessToken;
+    private String refreshToken;
+    private String userId;
+    private String username;
+    private String email;
+    private String fullName;
+    private Set<RoleName> roles;
 
-    private final String token;
-    private final String refreshToken;
-    private final String userId;
-    private final String username;
-    private final String email;
-    private final String fullName;
-    private final List<String> roles;
-
-    public JwtResponse(String token, String refreshToken, String userId, String username, String email, String fullName, List<String> roles) {
-        this.token = token;
+    public JwtResponse(String accessToken, String refreshToken, String userId,
+                       String username, String email, String fullName, Set<RoleName> roles) {
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.userId = userId;
         this.username = username;
@@ -22,31 +26,11 @@ public class JwtResponse {
         this.roles = roles;
     }
 
-    public String getAccessToken() {
-        return token;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
+    public String getAccessToken() { return accessToken; }
+    public String getRefreshToken() { return refreshToken; }
+    public String getUserId() { return userId; }
+    public String getUsername() { return username; }
+    public String getEmail() { return email; }
+    public String getFullName() { return fullName; }
+    public Set<RoleName> getRoles() { return roles; }
 }

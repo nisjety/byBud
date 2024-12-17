@@ -1,20 +1,25 @@
 server:
   port: 8083
 
+auth-service:
+  url: http://localhost:8081
+delivery-service:
+  url: http://localhost:8082
+user-service:
+  url: http://localhost:8083
+
+
 spring:
   config:
     activate:
       on-profile: user-service
+
 
   datasource:
     name: user-service
     url: jdbc:h2:mem:bybud_user
     username: root
     password: password
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -22,7 +27,14 @@ spring:
       ddl-auto: update
     show-sql: true
 
+bybud:
+  security:
+    enabled: false
+
 logging:
   level:
     root: DEBUG
 
+cors:
+  allowed-origins: http://localhost:5173,http://user-service.example.com
+  allowed-methods: GET,POST,PUT,OPTIONS

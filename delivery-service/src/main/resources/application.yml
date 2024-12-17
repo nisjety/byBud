@@ -7,6 +7,16 @@ spring:
     activate:
       on-profile: delivery-service
 
+
+
+auth-service:
+  url: http://localhost:8081
+delivery-service:
+  url: http://localhost:8082
+user-service:
+  url: http://localhost:8083
+
+
   datasource:
     name: delivery-service
     url: jdbc:h2:mem:bybud_delivery
@@ -18,6 +28,8 @@ spring:
       show-sql: true
 
 bybud:
+  security:
+    enabled: true
   app:
     jwtSecret: R9uvesizQpPFmDWcFGmoB0RIpN84cEWLzwE5GjAOyfE=
     jwtRefreshSecret: R9uvesizQpPFmDWcFGmoB0RIpN84cEWLzwE5GjAOyfE@abcdefgh1234567890
@@ -27,3 +39,7 @@ bybud:
 logging:
   level:
     root: DEBUG
+
+cors:
+  allowed-origins: http://localhost:5173,http://delivery-service.example.com
+  allowed-methods: GET,POST,DELETE,OPTIONS

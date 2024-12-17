@@ -1,21 +1,23 @@
-import API from "./APIUtility";
+import { UserAPI } from "./APIUtility";
 
 const USER_API_URL = "/users/";
+const ROLE_API_URL = "/roles";
 
-// Fetch user profile by ID (matches UserDTO)
 export const getUserProfile = async (userId) => {
-    const response = await API.get(`${USER_API_URL}${userId}`);
-    return response.data; // Returns a UserDTO
+    const response = await UserAPI.get(`${USER_API_URL}${userId}`);
+    return response.data; // Returns UserDTO
 };
 
-// Update user profile (matches UserDTO fields)
 export const updateUserProfile = async (userId, updatedData) => {
-    const response = await API.put(`${USER_API_URL}${userId}`, updatedData);
-    return response.data; // Updated UserDTO is returned
+    const response = await UserAPI.put(`${USER_API_URL}${userId}`, updatedData);
+    return response.data; // Updated UserDTO
 };
 
-// Fetch users by role (returns List<UserDTO>)
-export const getUsersByRole = async (role) => {
-    const response = await API.get(`${USER_API_URL}role/${role}`);
-    return response.data;
+export const getRoles = async () => {
+    const response = await UserAPI.get(ROLE_API_URL);
+    console.log("Roles response:", response.data);
+    if (Array.isArray(response.data) && response.data.every((role) => role.name)) {
+        return response.data.map((role) => role.name); // Extract role names (e.g., ROLE_ADMIN)
+    }
+    throw new Error("Unexpected roles data format");
 };
