@@ -1,4 +1,4 @@
-package com.bybud.authservice.dto;
+package com.bybud.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;

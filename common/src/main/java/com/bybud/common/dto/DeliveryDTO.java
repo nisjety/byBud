@@ -1,32 +1,24 @@
-package com.bybud.deliveryservice.dto;
+package com.bybud.common.dto;
 
 import com.bybud.common.model.DeliveryStatus;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class DeliveryResponse {
+public class DeliveryDTO {
 
     private Long id;
-    private Long customerId;
-    private Long courierId;
     private String deliveryDetails;
     private String deliveryAddress;
     private String pickupAddress;
+    private Long customerId;
+    private Long courierId;
     private DeliveryStatus status;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
-    private String courierUsername;
 
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public Long getCustomerId() { return customerId; }
-    public void setCustomerId(Long customerId) { this.customerId = customerId; }
-
-    public Long getCourierId() { return courierId; }
-    public void setCourierId(Long courierId) { this.courierId = courierId; }
 
     public String getDeliveryDetails() { return deliveryDetails; }
     public void setDeliveryDetails(String deliveryDetails) { this.deliveryDetails = deliveryDetails; }
@@ -37,6 +29,12 @@ public class DeliveryResponse {
     public String getPickupAddress() { return pickupAddress; }
     public void setPickupAddress(String pickupAddress) { this.pickupAddress = pickupAddress; }
 
+    public Long getCustomerId() { return customerId; }
+    public void setCustomerId(Long customerId) { this.customerId = customerId; }
+
+    public Long getCourierId() { return courierId; }
+    public void setCourierId(Long courierId) { this.courierId = courierId; }
+
     public DeliveryStatus getStatus() { return status; }
     public void setStatus(DeliveryStatus status) { this.status = status; }
 
@@ -45,7 +43,4 @@ public class DeliveryResponse {
 
     public LocalDateTime getUpdatedDate() { return updatedDate; }
     public void setUpdatedDate(LocalDateTime updatedDate) { this.updatedDate = updatedDate; }
-
-    public String getCourierUsername() { return courierUsername; }
-    public void setCourierUsername(String courierUsername) { this.courierUsername = courierUsername; }
 }

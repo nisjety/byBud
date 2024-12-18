@@ -1,4 +1,4 @@
-package com.bybud.deliveryservice.dto;
+package com.bybud.common.dto;
 
 import com.bybud.common.model.DeliveryStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;

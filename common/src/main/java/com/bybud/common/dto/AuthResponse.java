@@ -1,4 +1,4 @@
-package com.bybud.authservice.dto;
+package com.bybud.common.dto;
 
 import com.bybud.common.model.RoleName;
 import com.fasterxml.jackson.annotation.JsonInclude;
