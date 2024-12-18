@@ -8,12 +8,12 @@ const CreateDelivery = () => {
         deliveryAddress: "",
     });
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false); // For success message
+    const [success, setSuccess] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-        setError(null); // Clear any existing errors on input change
+        setError(null);
     };
 
     const handleSubmit = async (e) => {
@@ -24,7 +24,7 @@ const CreateDelivery = () => {
             if (!userId) throw new Error("User ID not found. Please log in again.");
 
             const payload = {
-                customerId: Number(userId), // Ensure `customerId` is a number
+                customerId: Number(userId),
                 deliveryDetails: formData.deliveryDetails,
                 pickupAddress: formData.pickupAddress,
                 deliveryAddress: formData.deliveryAddress,

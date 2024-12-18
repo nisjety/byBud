@@ -8,9 +8,9 @@ public class DeliveryResponse {
 
     private Long id;
     private Long customerId;
-    private String customerName;      // Fetched from user-service
+    private String customerName;
     private Long courierId;
-    private String courierUsername;   // Fetched from user-service
+    private String courierUsername;
     private String deliveryDetails;
     private String pickupAddress;
     private String deliveryAddress;

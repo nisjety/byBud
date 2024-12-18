@@ -26,7 +26,7 @@ public class DeliveryServiceClient {
     private final RestTemplate restTemplate;
     private final String deliveryServiceBaseUrl;
     private final String userServiceBaseUrl;
-    private final ObjectMapper objectMapper; // Autowired mapper with JSR310 module
+    private final ObjectMapper objectMapper;
 
     public DeliveryServiceClient(
             RestTemplate restTemplate,

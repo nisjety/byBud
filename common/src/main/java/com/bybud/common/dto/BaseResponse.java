@@ -2,7 +2,7 @@ package com.bybud.common.dto;
 
 public class BaseResponse<T> {
 
-    private String status; // SUCCESS or ERROR
+    private String status;
     private String message;
     private T data;
 

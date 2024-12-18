@@ -9,8 +9,6 @@ public class UpdateDeliveryRequest {
 
     @NotNull(message = "Delivery ID is required.")
     private Long deliveryId;
-
-    // Courier assignment could be optional; if set, use a Long ID for consistency.
     private Long courierId;
 
     @NotNull(message = "Delivery status is required.")

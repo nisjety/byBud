@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
 import { login } from "../services/AuthService";
 import { useNavigate } from "react-router-dom";
 
@@ -21,9 +21,9 @@ const Login = ({ setAuthenticated }) => {
             const { data } = response;
 
             if (data) {
-                localStorage.setItem("userData", JSON.stringify(data)); // Store the full user data
-                localStorage.setItem("roles", JSON.stringify(data.roles)); // Store roles as a JSON string
-                localStorage.setItem("userId", data.id); // Store user ID
+                localStorage.setItem("userData", JSON.stringify(data));
+                localStorage.setItem("roles", JSON.stringify(data.roles));
+                localStorage.setItem("userId", data.id);
                 setAuthenticated(true);
 
                 // Redirect based on roles

@@ -1,6 +1,4 @@
 import axios from "axios";
-
-// Base URLs for different services
 const AUTH_BASE_URL = "http://localhost:8081/api";
 const DELIVERY_BASE_URL = "http://localhost:8082/api";
 const USER_BASE_URL = "http://localhost:8083/api";

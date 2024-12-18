@@ -12,7 +12,6 @@ public class JacksonConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        // Optionally configure date/time format or other settings
         return mapper;
     }
 }

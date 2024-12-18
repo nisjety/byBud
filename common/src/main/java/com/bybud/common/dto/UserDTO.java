@@ -3,7 +3,6 @@ package com.bybud.common.dto;
 import com.bybud.common.model.RoleName;
 import com.bybud.common.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -28,11 +27,10 @@ public class UserDTO {
         user.setActive(active);
         user.setDateOfBirth(dateOfBirth);
 
-        // Ensure roles are not null and assign them
         if (roles != null) {
             user.setRoles(roles);
         } else {
-            user.setRoles(Set.of()); // Assign an empty set if roles are null
+            user.setRoles(Set.of());
         }
 
         return user;

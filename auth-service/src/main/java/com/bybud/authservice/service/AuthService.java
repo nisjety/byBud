@@ -42,7 +42,7 @@ public class AuthService {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
-        user.setPassword(password); // Storing plain-text password (not secure, for MVP only)
+        user.setPassword(password);
         user.setFullName(fullName);
         user.setDateOfBirth(dateOfBirth);
         user.setPhoneNumber(phoneNumber);

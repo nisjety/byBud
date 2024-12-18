@@ -37,6 +37,6 @@ public abstract class BaseEntity {
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         this.createdDate = now;
-        this.updatedDate = now; // Initialize on creation
+        this.updatedDate = now;
     }
 }

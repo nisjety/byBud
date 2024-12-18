@@ -7,7 +7,7 @@ const CourierPage = () => {
     const [deliveries, setDeliveries] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [selectedStatus, setSelectedStatus] = useState({}); // Track selected status for updates
+    const [selectedStatus, setSelectedStatus] = useState({});
 
     useEffect(() => {
         const fetchCourierDataAndDeliveries = async () => {

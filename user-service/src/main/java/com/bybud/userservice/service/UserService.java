@@ -34,7 +34,7 @@ public class UserService {
         user.setFullName(createUserDTO.getFullName());
         user.setDateOfBirth(createUserDTO.getDateOfBirth());
         user.setPhoneNumber(createUserDTO.getPhoneNumber());
-        user.setPassword(createUserDTO.getPassword()); // Store plain-text password for MVP
+        user.setPassword(createUserDTO.getPassword());
         user.setRoles(Set.of(createUserDTO.getRoleName()));
         user.setActive(true);
 
