@@ -1,23 +1,43 @@
-import { DeliveryAPI } from "./APIUtility";
+import axios from "axios";
 
-const DELIVERY_API_URL = "/delivery/";
+const DELIVERY_API_BASE = "http://localhost:8082/api/delivery";
 
-export const createDelivery = async (deliveryDetails) => {
-    const response = await DeliveryAPI.post(DELIVERY_API_URL, deliveryDetails);
-    return response.data; // Align with CreateDeliveryResponse DTO
-};
-
+// Get deliveries for a specific customer
 export const getDeliveriesForCustomer = async (customerId) => {
-    const response = await DeliveryAPI.get(`${DELIVERY_API_URL}customer/${customerId}`);
-    return response.data;
+    const response = await axios.get(`${DELIVERY_API_BASE}/customer/${customerId}`);
+    return response.data.data; // Access the 'data' field from the API response
 };
 
-export const getBidsForDelivery = async (deliveryId) => {
-    const response = await DeliveryAPI.get(`${DELIVERY_API_URL}${deliveryId}/bids`);
-    return response.data;
+// Get deliveries for a specific courier
+export const getDeliveriesForCourier = async (courierId) => {
+    const response = await axios.get(`${DELIVERY_API_BASE}/courier/${courierId}`);
+    return response.data.data; // Access the 'data' field from the API response
 };
 
-export const placeBid = async (bidData) => {
-    const response = await DeliveryAPI.post(`${DELIVERY_API_URL}bid`, bidData);
-    return response.data;
+// Create a new delivery
+export const createDelivery = async (deliveryData) => {
+    const response = await axios.post(`${DELIVERY_API_BASE}`, deliveryData, {
+        headers: { "Content-Type": "application/json" },
+    });
+    return response.data.data;
+};
+
+// Accept a delivery (Courier)
+export const acceptDelivery = async (deliveryId, courierId) => {
+    const response = await axios.put(`${DELIVERY_API_BASE}/${deliveryId}/accept/${courierId}`);
+    return response.data.data;
+};
+
+// Update delivery status
+export const updateDeliveryStatus = async (deliveryId, status, userId) => {
+    const response = await axios.put(`${DELIVERY_API_BASE}/${deliveryId}/status`, null, {
+        params: { status, userId },
+    });
+    return response.data.data;
+};
+
+// Get all deliveries
+export const getAllDeliveries = async () => {
+    const response = await axios.get(`${DELIVERY_API_BASE}`);
+    return response.data.data;
 };

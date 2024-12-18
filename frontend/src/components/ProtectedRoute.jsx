@@ -1,38 +1,18 @@
-import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import React from "react";
+import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-const ProtectedRoute = ({ children }) => {
-    const navigate = useNavigate();
-    const token = localStorage.getItem("token");
-
-    if (token) {
-        try {
-            const decodedToken = jwtDecode(token);
-            const isTokenValid = decodedToken.exp * 1000 > Date.now();
-
-            if (!isTokenValid) {
-                localStorage.removeItem("token");
-                localStorage.removeItem("userData"); // Only clear relevant data
-                navigate("/login", { replace: true });
-                return null;
-            }
-        } catch (error) {
-            console.error("Invalid token", error);
-            localStorage.removeItem("token");
-            localStorage.removeItem("userData");
-            navigate("/login", { replace: true });
-            return null;
-        }
-        return children;
+const ProtectedRoute = ({ children, authenticated }) => {
+    if (!authenticated) {
+        return <Navigate to="/login" replace />;
     }
 
-    navigate("/login", { replace: true });
-    return null;
+    return children;
 };
 
 ProtectedRoute.propTypes = {
     children: PropTypes.node.isRequired,
+    authenticated: PropTypes.bool.isRequired,
 };
 
 export default ProtectedRoute;

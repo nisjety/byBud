@@ -2,20 +2,17 @@ package com.bybud.deliveryservice.model;
 
 import com.bybud.common.model.BaseEntity;
 import com.bybud.common.model.DeliveryStatus;
-import com.bybud.common.model.User;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "deliveries")
 public class Delivery extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private User customer;
+    @Column(name = "customer_id", nullable = false)
+    private Long customerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "courier_id")
-    private User courier;
+    @Column(name = "courier_id")
+    private Long courierId;
 
     @Column(name = "delivery_details", nullable = false)
     private String deliveryDetails;
@@ -32,19 +29,20 @@ public class Delivery extends BaseEntity {
 
     public Delivery() {}
 
-    public Delivery(User customer, String deliveryDetails, String pickupAddress, String deliveryAddress) {
-        this.customer = customer;
+    public Delivery(Long customerId, String deliveryDetails, String pickupAddress, String deliveryAddress) {
+        this.customerId = customerId;
         this.deliveryDetails = deliveryDetails;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
         this.status = DeliveryStatus.CREATED;
     }
 
-    public User getCustomer() { return customer; }
-    public void setCustomer(User customer) { this.customer = customer; }
+    // Getters and Setters
+    public Long getCustomerId() { return customerId; }
+    public void setCustomerId(Long customerId) { this.customerId = customerId; }
 
-    public User getCourier() { return courier; }
-    public void setCourier(User courier) { this.courier = courier; }
+    public Long getCourierId() { return courierId; }
+    public void setCourierId(Long courierId) { this.courierId = courierId; }
 
     public String getDeliveryDetails() { return deliveryDetails; }
     public void setDeliveryDetails(String deliveryDetails) { this.deliveryDetails = deliveryDetails; }
@@ -58,3 +56,4 @@ public class Delivery extends BaseEntity {
     public DeliveryStatus getStatus() { return status; }
     public void setStatus(DeliveryStatus status) { this.status = status; }
 }
+

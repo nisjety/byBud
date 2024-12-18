@@ -1,9 +1,9 @@
 package com.bybud.deliveryservice.controller;
 
 import com.bybud.common.dto.BaseResponse;
+import com.bybud.common.dto.CreateDeliveryRequest;
+import com.bybud.common.dto.DeliveryResponse;
 import com.bybud.common.model.DeliveryStatus;
-import com.bybud.deliveryservice.dto.CreateDeliveryRequest;
-import com.bybud.deliveryservice.dto.DeliveryResponse;
 import com.bybud.deliveryservice.service.DeliveryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,49 +22,46 @@ public class DeliveryController {
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse<DeliveryResponse>> createDelivery(@Valid @RequestBody CreateDeliveryRequest request,
-                                                                         @RequestHeader("Authorization") String authHeader) {
-        String jwtToken = extractJwtFromHeader(authHeader);
-        DeliveryResponse response = deliveryService.createDelivery(request, jwtToken);
+    public ResponseEntity<BaseResponse<DeliveryResponse>> createDelivery(@Valid @RequestBody CreateDeliveryRequest request) {
+        DeliveryResponse response = deliveryService.createDelivery(request);
         return ResponseEntity.ok(BaseResponse.success("Delivery created successfully.", response));
     }
 
-    @GetMapping
-    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getDeliveries(@RequestHeader("Authorization") String authHeader) {
-        String jwtToken = extractJwtFromHeader(authHeader);
-        List<DeliveryResponse> deliveries = deliveryService.getDeliveries(jwtToken);
-        return ResponseEntity.ok(BaseResponse.success("Deliveries fetched successfully.", deliveries));
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getDeliveriesForCustomer(@PathVariable("customerId") Long customerId) {
+        List<DeliveryResponse> deliveries = deliveryService.getDeliveriesForCustomer(customerId);
+        return ResponseEntity.ok(BaseResponse.success("Customer deliveries fetched successfully.", deliveries));
     }
 
-    @PutMapping("/{deliveryId}/accept")
-    public ResponseEntity<BaseResponse<DeliveryResponse>> acceptDelivery(@PathVariable Long deliveryId,
-                                                                         @RequestHeader("Authorization") String authHeader) {
-        String jwtToken = extractJwtFromHeader(authHeader);
-        DeliveryResponse response = deliveryService.acceptDelivery(deliveryId, jwtToken);
-        return ResponseEntity.ok(BaseResponse.success("Delivery accepted successfully.", response));
+    @GetMapping
+    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getAllDeliveries(@RequestParam Long userId) {
+        List<DeliveryResponse> deliveries = deliveryService.getAllDeliveries(userId);
+        return ResponseEntity.ok(BaseResponse.success("All deliveries fetched successfully.", deliveries));
     }
+
+    @GetMapping("/courier/{courierId}")
+    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getDeliveriesForCourier(@PathVariable("courierId") Long courierId) {
+        List<DeliveryResponse> deliveries = deliveryService.getDeliveriesForCourier(courierId);
+        return ResponseEntity.ok(BaseResponse.success("Courier deliveries fetched successfully.", deliveries));
+    }
+
+    @PutMapping("/{deliveryId}/accept/{courierId}")
+    public ResponseEntity<BaseResponse<DeliveryResponse>> acceptDelivery(
+            @PathVariable("deliveryId") Long deliveryId,
+            @PathVariable("courierId") Long courierId
+    ) {
+        DeliveryResponse response = deliveryService.acceptDelivery(deliveryId, courierId);
+        return ResponseEntity.ok(BaseResponse.success("Delivery accepted successfully by courier.", response));
+    }
+
 
     @PutMapping("/{deliveryId}/status")
-    public ResponseEntity<BaseResponse<DeliveryResponse>> updateDeliveryStatus(@PathVariable Long deliveryId,
-                                                                               @RequestParam DeliveryStatus status,
-                                                                               @RequestHeader("Authorization") String authHeader) {
-        String jwtToken = extractJwtFromHeader(authHeader);
-        DeliveryResponse response = deliveryService.updateDeliveryStatus(deliveryId, status, jwtToken);
+    public ResponseEntity<BaseResponse<DeliveryResponse>> updateDeliveryStatus(
+            @PathVariable("deliveryId") Long deliveryId,
+            @RequestParam("status") DeliveryStatus status,
+            @RequestParam("userId") Long userId
+    ) {
+        DeliveryResponse response = deliveryService.updateDeliveryStatus(deliveryId, status, userId);
         return ResponseEntity.ok(BaseResponse.success("Delivery status updated successfully.", response));
-    }
-
-    @GetMapping("/admin/all")
-    public ResponseEntity<BaseResponse<List<DeliveryResponse>>> getAllDeliveriesForAdmin(@RequestHeader("Authorization") String authHeader) {
-        String jwtToken = extractJwtFromHeader(authHeader);
-        List<DeliveryResponse> deliveries = deliveryService.getAllDeliveriesForAdmin(jwtToken);
-        return ResponseEntity.ok(BaseResponse.success("All deliveries fetched successfully for admin.", deliveries));
-    }
-
-    // Helper to extract JWT from Authorization header
-    private String extractJwtFromHeader(String authHeader) {
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-        throw new IllegalArgumentException("Authorization header is invalid or missing.");
     }
 }

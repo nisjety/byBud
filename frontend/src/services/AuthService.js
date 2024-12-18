@@ -1,33 +1,25 @@
-import { AuthAPI } from "./APIUtility";
+import axios from "axios";
 
-const AUTH_API_URL = "/auth";
+const AUTH_BASE_URL = "http://localhost:8081/api/auth";
 
 export const login = async (usernameOrEmail, password) => {
-    const formData = new FormData();
-    formData.append("usernameOrEmail", usernameOrEmail);
-    formData.append("password", password);
-
-    const response = await AuthAPI.post(`${AUTH_API_URL}/login`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }, // Ensure form-data is used
+    const response = await axios.post(`${AUTH_BASE_URL}/login`, {
+        usernameOrEmail,
+        password,
     });
-
-    return response.data; // Response matches the backend structure
+    return response.data;
 };
 
-
-
 export const register = async (registerData) => {
-    const response = await AuthAPI.post(`${AUTH_API_URL}/register`, registerData, {
+    const response = await axios.post(`${AUTH_BASE_URL}/register`, registerData, {
         headers: { "Content-Type": "application/json" },
     });
     return response.data;
 };
 
-export const refreshToken = async (refreshToken) => {
-    const response = await AuthAPI.post(
-        `${AUTH_API_URL}/refresh-token`,
-        { refreshToken },
-        { headers: { "Content-Type": "application/json" } }
-    );
+export const getUserDetails = async (usernameOrEmail) => {
+    const response = await axios.get(`${AUTH_BASE_URL}/user`, {
+        params: { usernameOrEmail },
+    });
     return response.data;
 };

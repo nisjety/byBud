@@ -7,7 +7,6 @@ import com.bybud.common.model.User;
 import com.bybud.common.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +19,9 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public UserDTO createUser(CreateUserDTO createUserDTO) {
@@ -37,7 +34,7 @@ public class UserService {
         user.setFullName(createUserDTO.getFullName());
         user.setDateOfBirth(createUserDTO.getDateOfBirth());
         user.setPhoneNumber(createUserDTO.getPhoneNumber());
-        user.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
+        user.setPassword(createUserDTO.getPassword()); // Store plain-text password for MVP
         user.setRoles(Set.of(createUserDTO.getRoleName()));
         user.setActive(true);
 
@@ -83,6 +80,7 @@ public class UserService {
             throw new IllegalArgumentException("Email is already in use.");
         }
     }
+
     private UserDTO mapToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
@@ -96,4 +94,3 @@ public class UserService {
         return dto;
     }
 }
-

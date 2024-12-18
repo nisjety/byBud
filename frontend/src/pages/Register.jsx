@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { register } from "../services/AuthService";
-import { getRoles } from "../services/UserService";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -11,47 +10,32 @@ const Register = () => {
         password: "",
         fullName: "",
         dateOfBirth: "",
-        role: "", // No default role until fetched
+        phoneNumber: "",
+        role: "CUSTOMER", // Default role
     });
-    const [roles, setRoles] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchRoles = async () => {
-            try {
-                const rolesData = await getRoles();
-                setRoles(rolesData);
-                setFormData((prev) => ({
-                    ...prev,
-                    role: rolesData[0], // Default to the first role
-                }));
-            } catch (err) {
-                console.error("Error fetching roles:", err.message);
-                setError("Failed to fetch roles. Please try again later.");
-            }
-        };
-        fetchRoles();
-    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-        setError(null); // Clear error when the user modifies the form
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        console.log("FormData before sending:", formData);
+        setError(null);
 
         try {
-            const encodedData = new URLSearchParams(formData); // Convert to URL-encoded format
-            await register(encodedData);
+            const payload = {
+                ...formData,
+                roles: [formData.role],
+            };
+
+            await register(payload);
             toast.success("Registration successful!");
-            navigate("/dashboard");
+            navigate("/login");
         } catch (err) {
-            setError(err.response?.data?.message || "Registration failed.");
+            setError(err.response?.data?.message || "Registration failed. Please try again.");
         }
     };
 
@@ -60,18 +44,58 @@ const Register = () => {
             <h2>Register</h2>
             {error && <div style={{ color: "red" }}>{error}</div>}
             <form onSubmit={handleSubmit}>
-                <input name="username" value={formData.username} onChange={handleChange} placeholder="Username" />
-                <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" />
-                <input name="password" value={formData.password} onChange={handleChange} placeholder="Password" />
-                <input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Full Name" />
-                <input name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} type="date" />
-                <select name="role" value={formData.role} onChange={handleChange}>
-                    {roles.map((role) => (
-                        <option key={role} value={role}>
-                            {role}
-                        </option>
-                    ))}
-                </select>
+                <input
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    placeholder="Username"
+                    required
+                />
+                <input
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    required
+                />
+                <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    required
+                />
+                <input
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Full Name"
+                    required
+                />
+                <input
+                    name="dateOfBirth"
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                    required
+                />
+                <input
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    placeholder="Phone Number"
+                    required
+                />
+
+                <label>
+                    Role:
+                    <select name="role" value={formData.role} onChange={handleChange}>
+                        <option value="CUSTOMER">Customer</option>
+                        <option value="COURIER">Courier</option>
+                    </select>
+                </label>
+
                 <button type="submit">Register</button>
             </form>
         </div>

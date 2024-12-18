@@ -5,8 +5,8 @@ const Navbar = ({ authenticated, onLogout }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        onLogout(); // Use the onLogout function passed as a prop
-        navigate("/login");
+        onLogout();
+        navigate("/login", { replace: true });
     };
 
     return (
@@ -17,42 +17,25 @@ const Navbar = ({ authenticated, onLogout }) => {
                 </Link>
                 {authenticated ? (
                     <div className="navbar-links">
-                        <Link
-                            to="/delivery"
-                            aria-label="View Deliveries"
-                            aria-current={window.location.pathname === "/delivery" ? "page" : undefined}
-                        >
+                        <Link to="/profile" aria-label="Profile">
+                            Profile
+                        </Link>
+                        <Link to="/delivery" aria-label="Deliveries">
                             Deliveries
                         </Link>
-                        <Link
-                            to="/delivery/create"
-                            aria-label="Create a Delivery"
-                            aria-current={window.location.pathname === "/delivery/create" ? "page" : undefined}
-                        >
+                        <Link to="/delivery/create" aria-label="Create Delivery">
                             Create Delivery
                         </Link>
-                        <button
-                            className="btn-logout"
-                            onClick={handleLogout}
-                            aria-label="Logout"
-                        >
+                        <button className="btn-logout" onClick={handleLogout} aria-label="Logout">
                             Logout
                         </button>
                     </div>
                 ) : (
                     <div className="navbar-links">
-                        <Link
-                            to="/login"
-                            aria-label="Login"
-                            aria-current={window.location.pathname === "/login" ? "page" : undefined}
-                        >
+                        <Link to="/login" aria-label="Login">
                             Login
                         </Link>
-                        <Link
-                            to="/register"
-                            aria-label="Register"
-                            aria-current={window.location.pathname === "/register" ? "page" : undefined}
-                        >
+                        <Link to="/register" aria-label="Register">
                             Register
                         </Link>
                     </div>
@@ -64,7 +47,7 @@ const Navbar = ({ authenticated, onLogout }) => {
 
 Navbar.propTypes = {
     authenticated: PropTypes.bool.isRequired,
-    onLogout: PropTypes.func.isRequired, // Mark onLogout as required
+    onLogout: PropTypes.func.isRequired,
 };
 
 export default Navbar;

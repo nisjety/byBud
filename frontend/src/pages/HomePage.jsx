@@ -1,32 +1,27 @@
-import React from 'react';
-import { useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
-import "../styles/HomePage.css";
+import React from "react";
 
 const HomePage = () => {
-    const [activeTab, setActiveTab] = useState("login");
-
     return (
         <div className="home-page">
-            <h1>Welcome to ByBud</h1>
-            <div className="tab-container">
-                <button
-                    className={`tab ${activeTab === "login" ? "active" : ""}`}
-                    onClick={() => setActiveTab("login")}
-                >
-                    Login
-                </button>
-                <button
-                    className={`tab ${activeTab === "register" ? "active" : ""}`}
-                    onClick={() => setActiveTab("register")}
-                >
-                    Register
-                </button>
-            </div>
-            <div className="tab-content">
-                {activeTab === "login" ? <Login /> : <Register />}
-            </div>
+            <header className="home-header">
+                <h1>ByBud</h1> {/* Logo */}
+            </header>
+            <section className="home-content">
+                <h2>Velkommen til ByBud</h2>
+                <p>
+                    ByBud
+                    – en moderne løsning med røtter i byens historie.
+                    Vi tilbyr pålidelig og effektiv leveringstjeneste,
+                    der vi finnerde bedste budene i byen.
+                    Med oss kan du sende en pakke eller få
+                    hentet en.
+                    vi er ByBud din ideelle partner.
+                </p>
+                <div className="home-buttons">
+                    <a href="/login" className="btn btn-primary">Login</a>
+                    <a href="/register" className="btn btn-secondary">Registrer</a>
+                </div>
+            </section>
         </div>
     );
 };

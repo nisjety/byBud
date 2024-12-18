@@ -1,6 +1,5 @@
 package com.bybud.common.dto;
 
-import com.bybud.common.config.RoleNameDeserializer;
 import com.bybud.common.model.RoleName;
 import com.bybud.common.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
@@ -19,7 +17,6 @@ public class UserDTO {
     private String phoneNumber;
     private boolean active;
     private LocalDate dateOfBirth;
-    @JsonDeserialize(using = RoleNameDeserializer.class)
     private Set<RoleName> roles;
 
     public User toUser() {

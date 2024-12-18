@@ -1,133 +1,74 @@
 import React, { useEffect, useState } from "react";
-import { getUserProfile, updateUserProfile } from "../services/UserService";
+import { getDeliveriesForCustomer } from "../services/DeliveryService";
+import { getUserById } from "../services/UserService";
 
 const UserProfile = () => {
-    const [profile, setProfile] = useState(null);
-    const [editable, setEditable] = useState(false);
-    const [formData, setFormData] = useState({});
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const [deliveries, setDeliveries] = useState([]);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const fetchProfile = async () => {
-        try {
-            setLoading(true);
-            const userId = localStorage.getItem("userId");
-            if (!userId) throw new Error("User ID not found. Please log in again.");
-            const data = await getUserProfile(userId);
-            setProfile(data);
-            setFormData(data);
-        } catch (err) {
-            setError(err.response?.data?.error || err.message || "Failed to fetch profile.");
-        } finally {
-            setLoading(false);
-        }
-    };
+    const customerId = localStorage.getItem("userId");
 
     useEffect(() => {
-        fetchProfile();
-    }, []);
+        const fetchUserAndDeliveries = async () => {
+            try {
+                if (!customerId) throw new Error("User ID not found.");
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+                // Fetch the user data
+                const userData = await getUserById(Number(customerId));
+                setUser(userData);
 
-    const handleSaveChanges = async () => {
-        try {
-            const userId = localStorage.getItem("userId");
-            const updatedProfile = await updateUserProfile(userId, formData);
-            setProfile(updatedProfile);
-            setEditable(false);
-            setError(null);
-        } catch (err) {
-            setError(err.response?.data?.error || "Failed to update profile.");
-        }
-    };
+                // Fetch user's deliveries
+                const data = await getDeliveriesForCustomer(Number(customerId));
+                setDeliveries(data || []);
+            } catch (err) {
+                setError(err.response?.data?.message || err.message || "Failed to fetch your profile data.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    if (loading) return <p>Loading profile...</p>;
-    if (error)
-        return (
-            <div role="alert" style={{ color: "red" }}>
-                {error}
-                <button onClick={fetchProfile}>Retry</button>
-            </div>
-        );
+        fetchUserAndDeliveries();
+    }, [customerId]);
+
+    if (loading) return <p>Loading your profile...</p>;
+    if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return (
         <div>
-            <h2>{editable ? "Edit Profile" : "Your Profile"}</h2>
-            {editable ? (
-                <div>
-                    <label>
-                        Username:
-                        <input
-                            type="text"
-                            name="username"
-                            value={formData.username || ""}
-                            onChange={handleInputChange}
-                        />
-                    </label>
-                    <label>
-                        Full Name:
-                        <input
-                            type="text"
-                            name="fullName"
-                            value={formData.fullName || ""}
-                            onChange={handleInputChange}
-                            aria-label="Full Name"
-                        />
-                    </label>
-                    <label>
-                        Email:
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email || ""}
-                            onChange={handleInputChange}
-                        />
-                    </label>
-                    <label>
-                        Date of Birth:
-                        <input
-                            type="date"
-                            name="dateOfBirth"
-                            value={formData.dateOfBirth || ""}
-                            onChange={handleInputChange}
-                        />
-                    </label>
-                    <label>
-                        Roles:
-                        <input
-                            type="text"
-                            name="roles"
-                            value={formData.roles?.join(", ") || ""}
-                            onChange={(e) =>
-                                setFormData({ ...formData, roles: e.target.value.split(",") })
-                            }
-                        />
-                    </label>
-                    <button onClick={handleSaveChanges}>Save Changes</button>
-                    <button onClick={() => setEditable(false)}>Cancel</button>
+            <h2>User Profile</h2>
+            {user ? (
+                <div style={{ marginBottom: "20px" }}>
+                    <p><strong>Full Name:</strong> {user.fullName}</p>
+                    <p><strong>Email:</strong> {user.email}</p>
+                    <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
+                    <p><strong>Active:</strong> {user.active ? "Yes" : "No"}</p>
+                    <p><strong>Date of Birth:</strong> {user.dateOfBirth || "N/A"}</p>
+                    <p><strong>Roles:</strong> {user.roles ? user.roles.join(", ") : "None"}</p>
                 </div>
             ) : (
-                <div role="region" aria-label="Your Profile">
-                    <p>
-                        <strong>Username:</strong> {profile.username}
-                    </p>
-                    <p>
-                        <strong>Full Name:</strong> {profile.fullName}
-                    </p>
-                    <p>
-                        <strong>Email:</strong> {profile.email}
-                    </p>
-                    <p>
-                        <strong>Date of Birth:</strong> {profile.dateOfBirth}
-                    </p>
-                    <p>
-                        <strong>Roles:</strong> {profile.roles?.join(", ")}
-                    </p>
-                    <button onClick={() => setEditable(true)}>Edit Profile</button>
-                </div>
+                <p>User details not found.</p>
+            )}
+
+            <h3>Your Deliveries</h3>
+            {deliveries.length === 0 ? (
+                <p>No deliveries found.</p>
+            ) : (
+                <ul>
+                    {deliveries.map((delivery) => (
+                        <li key={delivery.id} style={{ marginBottom: "15px" }}>
+                            <strong>Details:</strong> {delivery.deliveryDetails || "N/A"} <br />
+                            <strong>Pickup Address:</strong> {delivery.pickupAddress || "N/A"} <br />
+                            <strong>Delivery Address:</strong> {delivery.deliveryAddress || "N/A"} <br />
+                            <strong>Status:</strong> {delivery.status || "Unknown"} <br />
+                            <strong>Created:</strong>{" "}
+                            {delivery.createdDate
+                                ? new Date(delivery.createdDate).toLocaleString()
+                                : "Unknown"}
+                        </li>
+                    ))}
+                </ul>
             )}
         </div>
     );

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types"; // Import PropTypes
 import { login } from "../services/AuthService";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ setAuthenticated }) => {
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
@@ -16,24 +17,26 @@ const Login = () => {
         setError(null);
 
         try {
-            const userData = await login(identifier, password);
+            const response = await login(identifier, password);
+            const { data } = response;
 
-            if (userData && Array.isArray(userData.roles)) {
-                // Store user data and token in localStorage
-                localStorage.setItem("userData", JSON.stringify(userData));
-                localStorage.setItem("token", userData.accessToken);
-                localStorage.setItem("userId", userData.userId);
+            if (data) {
+                localStorage.setItem("userData", JSON.stringify(data)); // Store the full user data
+                localStorage.setItem("roles", JSON.stringify(data.roles)); // Store roles as a JSON string
+                localStorage.setItem("userId", data.id); // Store user ID
+                setAuthenticated(true);
 
-                console.log("Login successful. Navigating to profile...");
-                navigate("/profile"); // Navigate to the non-protected route
-            } else {
-                throw new Error("Invalid response format. Roles are missing.");
+                // Redirect based on roles
+                if (data.roles.includes("COURIER")) {
+                    navigate("/courier");
+                } else if (data.roles.includes("CUSTOMER")) {
+                    navigate("/profile");
+                } else {
+                    navigate("/");
+                }
             }
         } catch (err) {
-            console.error("Login Error:", err);
-            const errorMessage =
-                err.response?.data?.message || "Login failed. Please check your credentials.";
-            setError(errorMessage);
+            setError(err.response?.data?.message || "Login failed. Please check your credentials.");
         } finally {
             setIsLoading(false);
         }
@@ -42,34 +45,36 @@ const Login = () => {
     return (
         <div>
             <h2>Login</h2>
-            {error && (
-                <div role="alert" aria-live="assertive" style={{ color: "red", marginBottom: "1rem" }}>
-                    {error}
-                </div>
-            )}
+            {error && <div style={{ color: "red" }}>{error}</div>}
             <form onSubmit={handleSubmit}>
-                <label htmlFor="identifier">Username or Email</label>
-                <input
-                    id="identifier"
-                    type="text"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
-                />
-                <label htmlFor="password">Password</label>
-                <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
+                <label>
+                    Username or Email:
+                    <input
+                        type="text"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        required
+                    />
+                </label>
+                <label>
+                    Password:
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </label>
                 <button type="submit" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Login"}
                 </button>
             </form>
         </div>
     );
+};
+
+Login.propTypes = {
+    setAuthenticated: PropTypes.func.isRequired,
 };
 
 export default Login;

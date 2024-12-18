@@ -22,19 +22,23 @@ import java.util.Map;
 public class DeliveryServiceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(DeliveryServiceClient.class);
+
     private final RestTemplate restTemplate;
     private final String deliveryServiceBaseUrl;
     private final String userServiceBaseUrl;
+    private final ObjectMapper objectMapper; // Autowired mapper with JSR310 module
 
-    public DeliveryServiceClient(RestTemplate restTemplate,
-                                 @Value("${delivery-service.url}") String deliveryServiceUrl,
-                                 @Value("${user-service.url}") String userServiceUrl) {
+    public DeliveryServiceClient(
+            RestTemplate restTemplate,
+            @Value("${delivery-service.url}") String deliveryServiceUrl,
+            @Value("${user-service.url}") String userServiceUrl,
+            ObjectMapper objectMapper
+    ) {
         this.restTemplate = restTemplate;
         this.deliveryServiceBaseUrl = deliveryServiceUrl;
         this.userServiceBaseUrl = userServiceUrl;
+        this.objectMapper = objectMapper;
     }
-
-
 
     @Retryable(retryFor = Exception.class, backoff = @Backoff(delay = 3000))
     public DeliveryDTO createDelivery(DeliveryDTO deliveryDTO) {
@@ -56,8 +60,8 @@ public class DeliveryServiceClient {
         try {
             ResponseEntity<List<DeliveryDTO>> response = restTemplate.exchange(
                     url, HttpMethod.GET, entity,
-                    new ParameterizedTypeReference<List<DeliveryDTO>>() {
-                    });
+                    new ParameterizedTypeReference<List<DeliveryDTO>>() {}
+            );
             return response.getBody();
         } catch (HttpStatusCodeException e) {
             logger.error("HTTP error: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
@@ -74,22 +78,25 @@ public class DeliveryServiceClient {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         try {
-            // Fetch the response as a Map to extract "data"
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {}
             );
 
-            // Extract the "data" field and map it to UserDTO
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && responseBody.containsKey("data")) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.convertValue(responseBody.get("data"), UserDTO.class);
+                UserDTO user = objectMapper.convertValue(responseBody.get("data"), UserDTO.class);
+                logger.debug("Fetched UserDTO: {}", user);
+                logger.debug("User roles for ID {}: {}", user.getId(), user.getRoles());
+                return user;
             } else {
                 throw new IllegalArgumentException("User data not found in the response.");
             }
         } catch (HttpStatusCodeException e) {
             logger.error("HTTP error: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw e;
+        } catch (Exception e) {
+            logger.error("Error fetching user by ID: {}", userId, e);
+            throw new RuntimeException("Error fetching user data", e);
         }
     }
 
@@ -111,3 +118,4 @@ public class DeliveryServiceClient {
         return headers;
     }
 }
+

@@ -1,15 +1,16 @@
 package com.bybud.common.dto;
 
 import com.bybud.common.model.DeliveryStatus;
+
 import java.time.LocalDateTime;
 
 public class DeliveryResponse {
 
     private Long id;
     private Long customerId;
-    private String customerName;
+    private String customerName;      // Fetched from user-service
     private Long courierId;
-    private String courierUsername;
+    private String courierUsername;   // Fetched from user-service
     private String deliveryDetails;
     private String pickupAddress;
     private String deliveryAddress;
@@ -50,4 +51,20 @@ public class DeliveryResponse {
 
     public LocalDateTime getUpdatedDate() { return updatedDate; }
     public void setUpdatedDate(LocalDateTime updatedDate) { this.updatedDate = updatedDate; }
+
+    public static DeliveryResponse fromDTO(DeliveryDTO dto, String customerName, String courierUsername) {
+        DeliveryResponse response = new DeliveryResponse();
+        response.setId(dto.getId());
+        response.setCustomerId(dto.getCustomerId());
+        response.setCustomerName(customerName);
+        response.setCourierId(dto.getCourierId());
+        response.setCourierUsername(courierUsername);
+        response.setDeliveryDetails(dto.getDeliveryDetails());
+        response.setPickupAddress(dto.getPickupAddress());
+        response.setDeliveryAddress(dto.getDeliveryAddress());
+        response.setStatus(dto.getStatus());
+        response.setCreatedDate(dto.getCreatedDate());
+        response.setUpdatedDate(dto.getUpdatedDate());
+        return response;
+    }
 }
