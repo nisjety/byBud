@@ -1,4 +1,5 @@
- Service:
+	User Registration and Login:
+	•	Auth Service:
 	•	Handles user registration and login requests.
 	•	After a successful registration, sends user data to the User Service for storage.
 	•	Issues JWT tokens for authenticated users.
