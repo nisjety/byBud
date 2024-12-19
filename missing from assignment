@@ -1,0 +1,26 @@
+ Service:
+	•	Handles user registration and login requests.
+	•	After a successful registration, sends user data to the User Service for storage.
+	•	Issues JWT tokens for authenticated users.
+	2.	User Data Management:
+	•	User Service:
+	•	Stores user profiles and other user-related data received from the Auth Service.
+	•	Provides an API for other services (e.g., Delivery Service) to fetch user details.
+	3.	Delivery Operations:
+	•	Delivery Service:
+	•	Fetches user data (e.g., addresses) from the User Service.
+	•	Manages delivery-related operations, such as parcel pickup and drop-off.
+	4.	Common Module:
+	•	All services rely on the Common Module for:
+	•	DTO definitions.
+	•	Shared logic such as authentication, utilities, and error handling.
+	•	Simplified inter-service communication through shared API clients.
+
+Key Notes
+	•	Data Flow:
+	•	Auth → User Service: User registration sends user data to the User Service.
+	•	Delivery Service → User Service: Delivery Service fetches required user data.
+	•	Shared Dependency:
+	•	All services are dependent on the Common Module, which ensures consistency in communication, DTOs, and security logic.
+	•	Resilience and Scalability:
+	•	The architecture ensures loose coupling between services, allowing each service to scale independently.
